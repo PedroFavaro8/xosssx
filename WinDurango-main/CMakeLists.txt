@@ -51,21 +51,25 @@ add_custom_target(WinDurango ALL DEPENDS
 
 if (BUILD_TESTING)
     add_test(NAME WinDurangoHostSelfTest COMMAND WinDurangoHost --self-test)
+    set_tests_properties(WinDurangoHostSelfTest PROPERTIES TIMEOUT 120)
     add_test(NAME WinDurangoHostApiLoadTest
         COMMAND WinDurangoHost --load-apis)
     set_tests_properties(WinDurangoHostApiLoadTest PROPERTIES
-        WORKING_DIRECTORY "$<TARGET_FILE_DIR:WinDurangoHost>")
+        WORKING_DIRECTORY "$<TARGET_FILE_DIR:WinDurangoHost>"
+        TIMEOUT 120)
     add_test(NAME WinDurangoHostExternalApiLoadTest
         COMMAND WinDurangoHost --load-api $<TARGET_FILE:WinDurangoApiFixture>)
     set_tests_properties(WinDurangoHostExternalApiLoadTest PROPERTIES
-        WORKING_DIRECTORY "$<TARGET_FILE_DIR:WinDurangoHost>")
+        WORKING_DIRECTORY "$<TARGET_FILE_DIR:WinDurangoHost>"
+        TIMEOUT 120)
     if (WIN32)
         add_test(NAME WinDurangoHostPackageTest
             COMMAND WinDurangoHost --launch-package
                     "$<TARGET_FILE_DIR:WinDurangoHost>/apps/Test.wdapp")
         set_tests_properties(WinDurangoHostPackageTest PROPERTIES
             WORKING_DIRECTORY "$<TARGET_FILE_DIR:WinDurangoHost>"
-            PASS_REGULAR_EXPRESSION "package service started")
+            PASS_REGULAR_EXPRESSION "package service started"
+            TIMEOUT 120)
     endif()
 
     if (WIN32)
@@ -76,6 +80,7 @@ if (BUILD_TESTING)
                 COMMAND ${WINDURANGO_POWERSHELL} -NoProfile -ExecutionPolicy Bypass
                         -File "${CMAKE_SOURCE_DIR}/tests/validate_project.ps1"
             )
+            set_tests_properties(WinDurangoStaticProjectChecks PROPERTIES TIMEOUT 300)
         endif()
     endif()
 endif()
