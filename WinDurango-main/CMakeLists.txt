@@ -27,6 +27,7 @@ add_subdirectory(projects/WinDurango.ToolHelpX)
 add_subdirectory(projects/WinDurango.Host)
 add_subdirectory(tests/ApiFixture)
 add_subdirectory(tests/PackageFixture)
+add_subdirectory(samples/MinimalHomebrew)
 
 add_custom_target(WinDurango ALL DEPENDS
     WinDurango.Common
@@ -47,6 +48,7 @@ add_custom_target(WinDurango ALL DEPENDS
     WinDurangoApiFixture
     WinDurangoPackageApp
     WinDurangoPackageService
+    WinDurangoMinimalApp
 )
 
 if (BUILD_TESTING)
