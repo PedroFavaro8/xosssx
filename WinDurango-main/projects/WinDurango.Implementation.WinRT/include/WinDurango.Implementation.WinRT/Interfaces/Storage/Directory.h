@@ -7,10 +7,13 @@
 #include <winrt/Windows.Storage.h>
 #include <winrt/base.h>
 
-// Windows.h defines CreateFile as a macro (CreateFileA/W); make sure our
-// interface method keeps its plain name in every translation unit.
-#ifdef CreateFile
+// Windows.h defines CreateFile as a macro (CreateFileA/W); scope it out only
+// for our declarations and restore it afterwards so Win32/ATL headers keep
+// working in the same translation unit.
+#if defined(CreateFile)
+#pragma push_macro("CreateFile")
 #undef CreateFile
+#define WDIMPL_CREATEFILE_MACRO_RESTORED 1
 #endif
 
 using namespace winrt::Windows::Storage;
@@ -47,3 +50,8 @@ namespace wd::impl::winrt::interfaces::storage
         StorageFolder dir;
     };
 } // namespace wd::impl::winrt::interfaces::storage
+
+#if defined(WDIMPL_CREATEFILE_MACRO_RESTORED)
+#pragma pop_macro("CreateFile")
+#undef WDIMPL_CREATEFILE_MACRO_RESTORED
+#endif

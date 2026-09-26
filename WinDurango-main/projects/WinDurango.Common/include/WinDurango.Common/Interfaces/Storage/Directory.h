@@ -6,10 +6,13 @@
 #include <filesystem>
 #include <memory>
 
-// Windows.h defines CreateFile as a macro (CreateFileA/W); make sure our
-// interface method keeps its plain name in every translation unit.
-#ifdef CreateFile
+// Windows.h defines CreateFile as a macro (CreateFileA/W); scope it out only
+// for our declarations and restore it afterwards so Win32/ATL headers keep
+// working in the same translation unit.
+#if defined(CreateFile)
+#pragma push_macro("CreateFile")
 #undef CreateFile
+#define WD_CREATEFILE_MACRO_RESTORED 1
 #endif
 
 namespace wd::common::interfaces::storage
@@ -47,3 +50,8 @@ namespace wd::common::interfaces::storage
         virtual bool fileExists(std::string) = 0;
     };
 } // namespace wd::common::interfaces::storage
+
+#if defined(WD_CREATEFILE_MACRO_RESTORED)
+#pragma pop_macro("CreateFile")
+#undef WD_CREATEFILE_MACRO_RESTORED
+#endif
