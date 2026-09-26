@@ -1,0 +1,49 @@
+import "Windows.Xbox.System.idl";
+
+namespace Windows.Xbox.Achievements
+{
+    [uuid(4ACC760B-AA57-4F59-968D-1F9A6F124BF7)]
+    interface IAchievementEventInvoker
+    {
+        void FireAchievementUnlocked(
+            Windows.System.User user,
+            String titleId,
+            String achievementId,
+            String scid,
+            Windows.Foundation.DateTime unlockTime,
+            String extendedInfoUrl,
+            String correlationId,
+            Windows.Foundation.Collections.IVectorView<String> inAppRewards
+        );
+    };
+
+    delegate void AchievementUnlockedHandler(
+        Object sender,
+        Windows.Xbox.Achievements.AchievementUnlockedEventArgs args
+    );
+
+    [static_name("Windows.Xbox.Achievements.IAchievementNotifierStatics", 82CA180B-30E2-4EA0-A62E-B61697A2F334)]
+    runtimeclass AchievementNotifier
+    {
+        static Windows.Xbox.Achievements.AchievementSource GetTitleIdFilteredSource();
+        static Windows.Xbox.Achievements.AchievementSource GetUnfilteredSource();
+    };
+
+    [interface_name("Windows.Xbox.Achievements.IAchievementSource", 3B7E45DC-086E-4535-9A5D-C6E42CDEA33C)]
+    runtimeclass AchievementSource
+    {
+       event AchievementUnlockedHandler AchievementUnlocked;
+    };
+
+    [interface_name("IAchievementUnlockedEventArgs", 3441B0B3-B51B-4E11-A217-A6B7D9D22156)]
+    runtimeclass AchievementUnlockedEventArgs
+    {
+        Windows.System.User User { get; };
+        String TitleId { get; };
+        String ServiceConfigurationId { get; };
+        String AchievementId { get; };
+        Windows.Foundation.DateTime UnlockTime { get; };
+        Windows.Foundation.Uri ExtendedInfoUrl { get; };
+        Windows.Foundation.Collections.IVectorView<String> InAppRewardValue { get; };
+    };
+}

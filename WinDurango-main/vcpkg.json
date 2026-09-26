@@ -1,0 +1,11 @@
+{
+  "name": "windurango",
+  "version": "1.0",
+  "dependencies": [
+    "cppwinrt",
+    "detours",
+    "directxtex",
+    "kinectsdk2",
+    "zlib"
+  ]
+}

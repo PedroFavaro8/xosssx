@@ -1,0 +1,47 @@
+#pragma once
+#include <winrt/Windows.Foundation.Collections.h>
+#include <winrt/Windows.Storage.Streams.h>
+#include <winrt/Windows.ApplicationModel.h>
+#include <winrt/Windows.Storage.Provider.h>
+#include "WinDurangoWinRT.h"
+#include "Windows.Xbox.Storage.ConnectedStorageContainer.h"
+#include "Windows.Xbox.Storage.ContainerInfoQueryResult.h"
+#include "winrt/Windows.Storage.h"
+#include <robuffer.h>
+#include <shlobj.h>
+#include <strsafe.h>
+
+namespace winrt::Windows::Xbox::Storage
+{
+    struct ContainerInfo2;
+    struct BlobInfo;
+}
+
+namespace wd::WinRT
+{
+    class ConnectedStorage
+    {
+    public:
+        winrt::Windows::Foundation::IAsyncAction InitializeStorage(const wchar_t *name);
+        winrt::Windows::Foundation::IAsyncAction CreateContainer(winrt::hstring name) const;
+        winrt::Windows::Foundation::IAsyncOperation<winrt::Windows::Foundation::Collections::IMapView<winrt::hstring, winrt::Windows::Storage::Streams::IBuffer>> Get(winrt::hstring containerName, winrt::Windows::Foundation::Collections::IIterable<winrt::hstring> blobsToRead) const;
+        winrt::Windows::Foundation::IAsyncAction Read(winrt::hstring containerName, winrt::Windows::Foundation::Collections::IMapView<winrt::hstring, winrt::Windows::Storage::Streams::IBuffer> data) const;
+        winrt::Windows::Foundation::IAsyncAction Upload(winrt::hstring containerName, winrt::Windows::Foundation::Collections::IMapView<winrt::hstring, winrt::Windows::Storage::Streams::IBuffer> blobsToWrite, winrt::Windows::Foundation::Collections::IIterable<winrt::hstring> blobsToDelete, winrt::hstring displayName = {}) const;
+        winrt::Windows::Foundation::IAsyncOperation<winrt::Windows::Foundation::Collections::IVectorView<winrt::Windows::Xbox::Storage::BlobInfo>>GetBlobInfoAsync(winrt::hstring parentContainerName, winrt::hstring blobNamePrefix);
+        winrt::Windows::Foundation::IAsyncOperation<winrt::Windows::Foundation::Collections::IVectorView<winrt::Windows::Xbox::Storage::ContainerInfo2>>GetContainerInfo2Async();
+        winrt::Windows::Foundation::IAsyncOperation<winrt::Windows::Foundation::Collections::IVectorView<winrt::Windows::Xbox::Storage::ContainerInfo>>GetContainerInfoAsync();
+        winrt::Windows::Foundation::IAsyncAction DeleteContainer(winrt::hstring containerName);
+
+        static winrt::Windows::Foundation::IAsyncAction CreateDirectories(const wchar_t *storageType, winrt::hstring &storagePath);
+        static winrt::Windows::Foundation::IAsyncOperation<bool> DoesFolderExist(winrt::hstring path);
+        static winrt::Windows::Foundation::IAsyncOperation<bool> DoesFileExist(winrt::Windows::Storage::StorageFolder folder, winrt::hstring path);
+
+        winrt::hstring m_storagePath;
+
+      private:
+        static winrt::hstring ObtainPackageName();
+    };
+
+    inline ConnectedStorage *g_UserStorage;
+    inline ConnectedStorage *g_MachineStorage;
+}

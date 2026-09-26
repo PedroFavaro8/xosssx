@@ -1,0 +1,261 @@
+import "Windows.Xbox.System.idl";
+
+namespace Windows.Xbox.Networking
+{
+    [flags]
+    enum CreateSecureDeviceAssociationBehavior
+    {
+        Default = 0x0,
+        Reevaluate = 0x1,
+    };
+
+    enum MultiplayerSessionRequirement
+    {
+        Required,
+        Optional,
+        None,
+    };
+
+    enum NetworkAccessType
+    {
+        Open,
+        Moderate,
+        Strict,
+    };
+
+    enum QualityOfServiceMeasurementStatus
+    {
+        Unknown,
+        Success,
+        PartialResults,
+        HostUnreachable,
+        MeasurementTimedOut,
+        SecureConnectionAttemptTimedOut,
+        SecureConnectionAttemptError,
+    };
+
+    enum QualityOfServiceMetric
+    {
+        Invalid,
+        PrivatePayload,
+        LatencyAverage,
+        LatencyMaximum,
+        LatencyMinimum,
+        BandwidthUp,
+        BandwidthUpMaximum,
+        BandwidthUpMinimum,
+        BandwidthDown,
+        BandwidthDownMaximum,
+        BandwidthDownMinimum,
+    };
+
+    enum SecureDeviceAssociationState
+    {
+        Invalid,
+        CreatingOutbound,
+        CreatingInbound,
+        Ready,
+        DestroyingLocal,
+        DestroyingRemote,
+        Destroyed,
+    };
+
+    [flags]
+    enum SecureDeviceAssociationUsage
+    {
+        Default = 0x0,
+        InitiateFromMicrosoftConsole = 0x1,
+        InitiateFromXboxLiveCompute = 0x2,
+        InitiateFromOtherDevice = 0x4,
+        InitiateFromWindowsDesktop = 0x8,
+        AcceptOnMicrosoftConsole = 0x100,
+        AcceptOnXboxLiveCompute = 0x200,
+        AcceptOnOtherDevice = 0x400,
+        AcceptOnWindowsDesktop = 0x800,
+    };
+
+    [flags]
+    enum SecureDeviceSocketUsage
+    {
+        Initiate = 0x1U,
+        Accept = 0x2U,
+        SendChat = 0x100U,
+        SendGameData = 0x200U,
+        SendDebug = 0x400U,
+        SendInsecure = 0x800U,
+        ReceiveChat = 0x10000U,
+        ReceiveGameData = 0x20000U,
+        ReceiveDebug = 0x40000U,
+        ReceiveInsecure = 0x80000U,
+    };
+
+    enum SecureIpProtocol
+    {
+        Udp = 0x1,
+        Tcp = 0x2,
+    };
+
+    struct ProtocolParserDescription
+    {
+        UInt64 NotYetImplemented;
+    };
+
+    struct SecureDeviceId
+    {
+        UInt64 NotYetImplemented;
+    };
+
+    [static_name("IErrorMessagesStatics", 0759380D-A6D3-443A-9441-E45EDC7677E6)]
+    runtimeclass ErrorMessages
+    {
+        static String GetMessageForError(UInt32 errorCode);
+    }
+
+    [interface_name("IMeasureQualityOfServiceResult", D7D51FB8-4E8E-4E11-B2A4-930F9C344A6A)]
+    runtimeclass MeasureQualityOfServiceResult
+    {
+        Windows.Foundation.Collections.IVectorView<QualityOfServiceMeasurement> Measurements { get; };
+        Windows.Foundation.Collections.IVectorView<QualityOfServiceMeasurement> GetMeasurementsForDevice(SecureDeviceAddress address);
+        Windows.Foundation.Collections.IVectorView<QualityOfServiceMeasurement> GetMeasurementsForMetric(QualityOfServiceMetric metric);
+        QualityOfServiceMeasurement GetMeasurement(SecureDeviceAddress address, QualityOfServiceMetric metric);
+    }
+
+    [static_name("INetworkCacheStatics", BFFF4B75-05A4-49B0-9383-C29DF62A8DA2)]
+    runtimeclass NetworkCache
+    {
+        static void SetNetworkCacheForUsers(Windows.Foundation.Collections.IVectorView<Windows.Xbox.System.User> pUsers);
+        static void ClearNetworkCache();
+    }
+
+    [interface_name("IQualityOfServiceMeasurement", 16FB373A-5239-4DA2-B43D-18E7A7BB1280)]
+    runtimeclass QualityOfServiceMeasurement
+    {
+        QualityOfServiceMeasurementStatus Status { get; };
+        QualityOfServiceMetric Metric { get; };
+        Windows.Foundation.IPropertyValue MetricValue { get; };
+        SecureDeviceAddress SecureDeviceAddress { get; };
+    }
+
+    [static_name("IQualityOfServiceStatics", D7D51FB8-4E8E-4E11-B2A4-930F9C344A6A)]
+    runtimeclass QualityOfService
+    {
+        static Windows.Foundation.IAsyncOperation<MeasureQualityOfServiceResult> MeasureQualityOfServiceAsync(Windows.Foundation.Collections.IIterable<SecureDeviceAddress> addresses,
+            Windows.Foundation.Collections.IIterable<QualityOfServiceMetric> metrics,
+            UInt32 timeoutInMilliseconds,
+            UInt32 numberOfProbes);
+        static void PublishPrivatePayload(UInt8[] payload);
+        static void ClearPrivatePayload();
+        static void ConfigureQualityOfService(UInt32 maxSimultaneousProbeConnections, Boolean constrainSystemBandwidthUp, Boolean constrainSystemBandwidthDown);
+    }
+
+    [interface_name("ISecureDeviceAddress", FF75B1AA-B91F-4A06-9E28-349A8C600976)]
+    [static_name("ISecureDeviceAddressStatics", 02ADDB0F-4880-4B1E-98B8-EE638AD89B55)]
+    runtimeclass SecureDeviceAddress
+    {
+        static UInt32 CompareBuffers(Windows.Storage.Streams.IBuffer buffer1, Windows.Storage.Streams.IBuffer buffer2);
+        static UInt32 CompareBytes(UInt8[] bytes1, UInt8[] bytes2);
+        static SecureDeviceAddress FromBytes(UInt8[] bytes);
+        static SecureDeviceAddress GetLocal();
+        static SecureDeviceAddress CreateDedicatedServerAddress(String hostnameOrAddress);
+        static SecureDeviceAddress FromBase64String(String base64String);
+        event Windows.Foundation.TypedEventHandler<SecureDeviceAddress, Object> BufferChanged;
+        Windows.Storage.Streams.IBuffer GetBuffer();
+        Int32 Compare(SecureDeviceAddress secureDeviceAddress);
+        String GetBase64String();
+        Boolean IsLocal { get; };
+        NetworkAccessType NetworkAccessType { get; };
+    }
+
+    [interface_name("ISecureDeviceAddressFactory", 82FFDA7B-C014-4988-9DBD-6252AA85B87B)]
+    runtimeclass SecureDeviceAddressFactory
+    {
+        SecureDeviceAddress CreateAddressFromBuffer(Windows.Storage.Streams.IBuffer buffer);
+    }
+
+    [interface_name("ISecureDeviceAssociationIncomingEventArgs", 279E7254-408B-4636-8846-46B51C5A57DB)]
+    runtimeclass SecureDeviceAssociationIncomingEventArgs
+    {
+        SecureDeviceAssociation Association { get; };
+    }
+
+    [interface_name("ISecureDeviceAssociationStateChangedEventArgs", 3B56E8F9-B99F-47B9-9717-25C517347ADC)]
+    runtimeclass SecureDeviceAssociationStateChangedEventArgs
+    {
+        SecureDeviceAssociationState OldState { get; };
+        SecureDeviceAssociationState NewState { get; };
+    }
+
+    [interface_name("ISecureDeviceAssociation", CCE4FE47-86FC-467C-A121-83061F4B0286)]
+    [static_name("ISecureDeviceAssociationStatics", 15661441-F13A-46E4-8AC2-F474D59B1F0C)]
+    runtimeclass SecureDeviceAssociation
+    {
+        static SecureDeviceAssociation GetAssociationBySocketAddressBytes(UInt8[] remoteSocketAddressBytes, UInt8[] localSocketAddressBytes);
+        static SecureDeviceAssociation GetAssociationByHostNamesAndPorts(Windows.Networking.HostName remoteHostName, String remotePort, Windows.Networking.HostName localHostName, String localPort);
+        event Windows.Foundation.TypedEventHandler<SecureDeviceAssociation, SecureDeviceAssociationStateChangedEventArgs> StateChanged;
+        Windows.Foundation.IAsyncAction DestroyAsync();
+        UInt8[] GetRemoteSocketAddressBytes();
+        UInt8[] GetLocalSocketAddressBytes();
+        SecureDeviceAssociationState State { get; };
+        SecureDeviceAssociationTemplate Template { get; };
+        SecureDeviceAddress RemoteSecureDeviceAddress { get; };
+        Windows.Networking.HostName RemoteHostName { get; };
+        String RemotePort { get; };
+        Windows.Networking.HostName LocalHostName { get; };
+        String LocalPort { get; };
+    }
+
+    [interface_name("ISecureDeviceAssociationTemplate", 5479611E-35FA-4241-95BA-DF8E8338C739)]
+    [static_name("ISecureDeviceAssociationTemplateStatics", 46745A18-697A-47E1-BB62-CC71DE0FDD8C)]
+    runtimeclass SecureDeviceAssociationTemplate
+    {
+        static SecureDeviceAssociationTemplate GetTemplateByName(String name);
+        static Windows.Foundation.Collections.IVectorView<SecureDeviceAssociationTemplate> Templates { get; };
+        event Windows.Foundation.TypedEventHandler<SecureDeviceAssociationTemplate, SecureDeviceAssociationIncomingEventArgs> AssociationIncoming;
+        Windows.Foundation.IAsyncOperation<SecureDeviceAssociation> CreateAssociationAsync(
+            SecureDeviceAddress secureDeviceAddress,
+            CreateSecureDeviceAssociationBehavior behavior);
+        Windows.Foundation.IAsyncOperation<SecureDeviceAssociation> CreateAssociationForPortsAsync(
+            SecureDeviceAddress secureDeviceAddress,
+            CreateSecureDeviceAssociationBehavior behavior,
+            String initiatorPort,
+            String acceptorPort);
+        Windows.Foundation.IAsyncOperation<Windows.Storage.Streams.IBuffer> CreateCertificateRequestAsync(String subjectName);
+        Windows.Foundation.IAsyncAction InstallCertificateAsync(Windows.Storage.Streams.IBuffer certificateBuffer);
+        String Name { get; };
+        SecureDeviceSocketDescription InitiatorSocketDescription { get; };
+        SecureDeviceSocketDescription AcceptorSocketDescription { get; };
+        SecureDeviceAssociationUsage AllowedUsages { get; };
+        String RelyingParty { get; };
+        Windows.Foundation.Collections.IVectorView<ProtocolParserDescription> ProtocolParserDescriptions { get; };
+        Windows.Foundation.Collections.IVectorView<QualityOfServiceMetric> QualityOfServiceMetricPathPriorities { get; };
+        MultiplayerSessionRequirement MultiplayerSessionRequirement { get; };
+        Windows.Foundation.Collections.IVectorView<SecureDeviceAssociation> Associations { get; };
+    }
+
+    [interface_name("ISecureDeviceSocketDescription", 9835ED01-7B1E-41FC-B64D-7D20448892D6)]
+    runtimeclass SecureDeviceSocketDescription
+    {
+        String Name { get; };
+        SecureIpProtocol IpProtocol { get; };
+        UInt16 BoundPortRangeLower { get; };
+        UInt16 BoundPortRangeUpper { get; };
+        SecureDeviceSocketUsage AllowedUsages { get; };
+    }
+
+    [static_name("IDevelopmentStatics", AA9B7503-B9FC-4986-BC40-5B0477CD9BF7)]
+    runtimeclass Development
+    {
+        static SecureDeviceAddress CreateSecureDeviceAddressFromHostNames(
+            SecureDeviceId secureDeviceId, 
+            Windows.Foundation.Collections.IIterable<Windows.Networking.HostName> hostNames);
+        static SecureDeviceSocketDescription CreateSecureDeviceSocketDescription(String name, SecureIpProtocol secureIpProtocol, 
+            UInt16 boundPortRangeLower, UInt16 boundPortRangeUpper, SecureDeviceSocketUsage allowedUsages);
+        static SecureDeviceAssociationTemplate CreateSecureDeviceAssociationTemplate(String name, 
+            SecureDeviceSocketDescription initiatorSecureDeviceSocketDescription, 
+            SecureDeviceSocketDescription acceptorSecureDeviceSocketDescription, 
+            SecureDeviceAssociationUsage allowedUsages, String relyingParty, 
+            Windows.Foundation.Collections.IIterable<ProtocolParserDescription> protocolParserDescriptions, 
+            Windows.Foundation.Collections.IIterable<QualityOfServiceMetric> qualityOfServiceMetricPathPriorities, 
+            MultiplayerSessionRequirement multiplayerSessionRequirement);
+    }
+}

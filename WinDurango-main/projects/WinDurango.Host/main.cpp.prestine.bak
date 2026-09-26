@@ -1,0 +1,277 @@
+#include <algorithm>
+#include <cctype>
+#include <filesystem>
+#include <iostream>
+#include <string>
+#include <utility>
+#include <vector>
+#include "WinDurango.Host/PlatformProfile.h"
+#include "WinDurango.Host/ProcessSupervisor.h"
+#include "WinDurango.Host/ApiLoader.h"
+
+#ifdef _WIN32
+#include <Windows.h>
+#endif
+
+int run_compatibility_window();
+
+namespace {
+
+constexpr const char* kVersion = "0.1.0-dev";
+
+const std::vector<std::string> kCompatibilityModules = {
+    "winrt_x.dll",
+    "kernelx.dll",
+    "d3d11_x.dll",
+    "d3d12_x.dll",
+    "mmdevapi.dll",
+    "mfplat.dll",
+    "etwplus.dll",
+    "pixEvt.dll",
+    "toolhelpx.dll",
+    "windows.kinect.dll",
+    "WinDurango.Implementation.WinRT.dll",
+    "WinDurango.Common.dll",
+};
+
+void print_usage(const char* program) {
+    std::cout << "WinDurangoHost " << kVersion << "\n"
+              << "Uso:\n"
+              << "  " << program << " --version\n"
+              << "  " << program << " --list-modules\n"
+              << "  " << program << " --capabilities\n"
+              << "  " << program << " --self-test\n"
+              << "  " << program << " --window\n"
+              << "  " << program << " --launch-dashboard <apps\\dashboard.exe> [--background <services\\service.exe>]...\n"
+              << "  " << program << " --launch-package <apps\\Homebrew.wdapp>\n"
+              << "  " << program << " --load-apis\n"
+              << "  " << program << " --load-api <absolute-or-relative-dll> [... ]\n"
+              << "  " << program << " --inspect-media <path>\n"
+              << "  " << program << " --probe <dll>\n";
+}
+
+int print_capabilities() {
+#ifdef _WIN32
+    SYSTEM_INFO systemInfo{};
+    GetNativeSystemInfo(&systemInfo);
+
+    MEMORYSTATUSEX memory{};
+    memory.dwLength = sizeof(memory);
+    if (!GlobalMemoryStatusEx(&memory)) {
+        std::cerr << "FAIL: não foi possível consultar a memória do sistema\n";
+        return 2;
+    }
+
+    const bool x64 = systemInfo.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_AMD64;
+    const auto totalGiB = static_cast<double>(memory.ullTotalPhys) / (1024.0 * 1024.0 * 1024.0);
+    const bool memoryTarget = memory.ullTotalPhys >= windurango::host::MinimumPhysicalMemoryBytes;
+
+    std::cout << "architecture=" << (x64 ? "x64" : "unsupported") << "\n"
+              << "physical_memory_gib=" << totalGiB << "\n"
+              << "memory_profile_8gb=" << (memoryTarget ? "pass" : "fail") << "\n"
+              << "graphics_backend=requires-d3d11-or-d3d12\n";
+
+    return x64 && memoryTarget ? 0 : 1;
+#else
+    std::cerr << "FAIL: --capabilities requer Windows\n";
+    return 3;
+#endif
+}
+
+int self_test() {
+    if (kCompatibilityModules.empty()) {
+        std::cerr << "FAIL: lista de módulos vazia\n";
+        return 1;
+    }
+
+    std::vector<std::string> normalized;
+    normalized.reserve(kCompatibilityModules.size());
+    for (const auto& module : kCompatibilityModules) {
+        const std::filesystem::path modulePath(module);
+        if (modulePath.has_parent_path() || modulePath.extension() != ".dll") {
+            std::cerr << "FAIL: entrada inválida no manifesto: " << module << "\n";
+            return 1;
+        }
+
+        auto lower = module;
+        std::transform(lower.begin(), lower.end(), lower.begin(),
+                       [](unsigned char ch) { return static_cast<char>(std::tolower(ch)); });
+        normalized.push_back(std::move(lower));
+    }
+
+    std::sort(normalized.begin(), normalized.end());
+    if (std::adjacent_find(normalized.begin(), normalized.end()) != normalized.end()) {
+        std::cerr << "FAIL: módulo duplicado (case-insensitive)\n";
+        return 1;
+    }
+
+    std::cout << "PASS: host e manifesto de módulos válidos\n";
+    return 0;
+}
+
+int probe_module(const std::filesystem::path& path) {
+#ifdef _WIN32
+    auto filename = path.filename().string();
+    std::transform(filename.begin(), filename.end(), filename.begin(),
+                   [](unsigned char ch) { return static_cast<char>(std::tolower(ch)); });
+    const bool allowed = std::any_of(kCompatibilityModules.begin(), kCompatibilityModules.end(),
+                                     [&](const std::string& candidate) {
+                                         auto normalized = candidate;
+                                         std::transform(normalized.begin(), normalized.end(), normalized.begin(),
+                                                        [](unsigned char ch) { return static_cast<char>(std::tolower(ch)); });
+                                         return normalized == filename;
+                                     });
+    if (!allowed) {
+        std::cerr << "FAIL: DLL fora do manifesto de compatibilidade: " << filename << "\n";
+        return 5;
+    }
+
+    std::error_code pathError;
+    const auto probePath = std::filesystem::weakly_canonical(path, pathError);
+    const auto probeRoot = std::filesystem::weakly_canonical(std::filesystem::current_path(), pathError);
+    if (pathError || probePath.parent_path() != probeRoot)
+    {
+        std::cerr << "FAIL: --probe aceita somente DLLs no diretório atual\n";
+        return 6;
+    }
+
+    if (!std::filesystem::exists(probePath)) {
+        std::cerr << "FAIL: DLL não encontrada: " << path.string() << "\n";
+        return 2;
+    }
+
+    HMODULE module = LoadLibraryExW(
+        probePath.wstring().c_str(), nullptr,
+        LOAD_LIBRARY_SEARCH_DLL_LOAD_DIR | LOAD_LIBRARY_SEARCH_DEFAULT_DIRS);
+    if (!module) {
+        std::cerr << "FAIL: não foi possível carregar a DLL; Win32=" << GetLastError() << "\n";
+        return 3;
+    }
+
+    std::cout << "PASS: carregada somente para diagnóstico: " << probePath.string() << "\n";
+    FreeLibrary(module);
+    return 0;
+#else
+    (void)path;
+    std::cerr << "FAIL: --probe requer Windows\n";
+    return 4;
+#endif
+}
+
+int inspect_media(const std::filesystem::path& path) {
+    std::error_code error;
+    if (!std::filesystem::exists(path, error) || error) {
+        std::cerr << "FAIL: mídia não encontrada: " << path.string() << "\n";
+        return 2;
+    }
+
+    std::string extension = path.extension().string();
+    std::transform(extension.begin(), extension.end(), extension.begin(),
+        [](unsigned char ch) { return static_cast<char>(std::tolower(ch)); });
+
+    if (extension == ".exe") {
+        std::cout << "media_type=win32-executable\n"
+                  << "execution_policy=apps-or-services-only\n"
+                  << "action=diagnostic-only\n";
+        return 0;
+    }
+    const std::string xvdExtension = std::string(".x") + "vd";
+    const std::string xexExtension = std::string(".x") + "ex";
+    if (extension == xvdExtension || extension == xexExtension) {
+        std::cout << "media_type=xbox-proprietary-format\n"
+                  << "execution_policy=unsupported\n"
+                  << "action=not-loaded\n";
+        return 4;
+    }
+
+    std::cout << "media_type=unknown\nexecution_policy=unsupported\n";
+    return 4;
+}
+
+} // namespace
+
+int main(int argc, char** argv) {
+    if (argc == 1) {
+        print_usage(argv[0]);
+        return 0;
+    }
+
+    const std::string command = argv[1];
+    if (command == "--version") {
+        std::cout << kVersion << "\n";
+        return 0;
+    }
+    if (command == "--list-modules") {
+        for (const auto& module : kCompatibilityModules) {
+            std::cout << module << "\n";
+        }
+        return 0;
+    }
+    if (command == "--capabilities") {
+        return print_capabilities();
+    }
+    if (command == "--self-test") {
+        return self_test();
+    }
+    if (command == "--window") {
+#ifdef _WIN32
+        windurango::host::LoadApis(std::filesystem::current_path() / "apis");
+        return run_compatibility_window();
+#else
+        std::cerr << "FAIL: --window requer Windows\n";
+        return 3;
+#endif
+    }
+    if (command == "--launch-dashboard" && argc >= 3) {
+        windurango::host::LoadApis(std::filesystem::current_path() / "apis");
+        windurango::host::LaunchPlan plan{std::filesystem::path(argv[2]), {}};
+        for (int index = 3; index < argc; ++index) {
+            if (std::string(argv[index]) != "--background" || index + 1 >= argc) {
+                std::cerr << "FAIL: use --background <services\\service.exe>\n";
+                return 64;
+            }
+            plan.background.emplace_back(argv[++index]);
+        }
+        return windurango::host::LaunchDashboard(plan);
+    }
+    if (command == "--launch-package" && argc == 3) {
+        windurango::host::LoadApis(std::filesystem::current_path() / "apis");
+        return windurango::host::LaunchPackage(argv[2]);
+    }
+    if (command == "--load-apis") {
+        const auto result = windurango::host::LoadApis(std::filesystem::current_path() / "apis");
+        std::cout << "apis_discovered=" << result.discovered << "\n"
+                  << "apis_loaded=" << result.loaded << "\n";
+        return 0;
+    }
+    if (command == "--load-api" && argc >= 3) {
+        int loaded = 0;
+        for (int index = 2; index < argc; ++index) {
+            if (std::string(argv[index]) != "--load-api") {
+                if (index != 2) {
+                    std::cerr << "FAIL: use --load-api <dll> repetidamente\n";
+                    return 64;
+                }
+                if (windurango::host::LoadApiFile(argv[index])) {
+                    ++loaded;
+                }
+                continue;
+            }
+            if (index + 1 >= argc || !windurango::host::LoadApiFile(argv[++index])) {
+                return 4;
+            }
+            ++loaded;
+        }
+        std::cout << "apis_loaded=" << loaded << "\n";
+        return loaded > 0 ? 0 : 4;
+    }
+    if (command == "--inspect-media" && argc == 3) {
+        return inspect_media(argv[2]);
+    }
+    if (command == "--probe" && argc == 3) {
+        return probe_module(argv[2]);
+    }
+
+    print_usage(argv[0]);
+    return 64;
+}

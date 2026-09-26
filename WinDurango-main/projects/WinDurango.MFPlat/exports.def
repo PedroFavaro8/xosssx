@@ -1,0 +1,7 @@
+LIBRARY mfplat
+EXPORTS
+	MFCreateDXGISurfaceBufferX	  @33
+	MFCreateDxvaSampleRendererX   @34
+	MFCreateNV12ToRGB32ConverterX @47
+	MFCreateRGB32ToNV12ConverterX @50
+	MFResetDXGIDeviceManagerX	  @115

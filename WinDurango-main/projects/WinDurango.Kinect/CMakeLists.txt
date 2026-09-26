@@ -1,0 +1,108 @@
+cmake_minimum_required(VERSION 3.30)
+project(WinDurango.Kinect VERSION 1.0.0)
+
+set(VERSION_SUFFIX "-dev.1") # used for non-stable versions, otherwise blank
+set(CMAKE_CXX_STANDARD 20)
+
+find_package(unofficial-kinectsdk2 CONFIG REQUIRED HINTS "${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-windows/share/unofficial-kinectsdk2")
+
+add_compile_definitions(_AMD64_)
+
+make_directory(${CMAKE_CURRENT_SOURCE_DIR}/WinMetadata)
+file(GLOB IDL_FILES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/idl/*.idl")
+cmake_path(CONVERT "${IDL_FILES}" TO_NATIVE_PATH_LIST IDL_FILES)
+
+foreach(IDL_FILE ${IDL_FILES})
+    if(EXISTS "$ENV{WindowsSdkDir}References\\$ENV{WindowsSdkVersion}Windows.Foundation.UniversalApiContract\\20.0.0.0\\Windows.Foundation.UniversalApiContract.winmd")
+        execute_process(
+            COMMAND midl
+                /winrt /h nul /nomidl /x64
+                /I "${CMAKE_CURRENT_SOURCE_DIR}/idl"
+                /metadata_dir "$ENV{WindowsSdkDir}References\\$ENV{WindowsSdkVersion}Windows.Foundation.FoundationContract\\4.0.0.0"
+                /reference "$ENV{WindowsSdkDir}References\\$ENV{WindowsSdkVersion}Windows.Foundation.FoundationContract\\4.0.0.0\\Windows.Foundation.FoundationContract.winmd"
+                /reference "$ENV{WindowsSdkDir}References\\$ENV{WindowsSdkVersion}Windows.Foundation.UniversalApiContract\\20.0.0.0\\Windows.Foundation.UniversalApiContract.winmd"
+                /out "${CMAKE_CURRENT_SOURCE_DIR}\\WinMetadata"
+                ${IDL_FILE}
+            RESULT_VARIABLE MIDL_RESULT
+            ERROR_VARIABLE MIDL_ERROR)
+    else()
+        execute_process(
+            COMMAND midl
+                /winrt /h nul /nomidl /x64
+                /I "${CMAKE_CURRENT_SOURCE_DIR}/idl"
+                /metadata_dir "$ENV{WindowsSdkDir}References\\$ENV{WindowsSdkVersion}Windows.Foundation.FoundationContract\\4.0.0.0"
+                /reference "$ENV{WindowsSdkDir}References\\$ENV{WindowsSdkVersion}Windows.Foundation.FoundationContract\\4.0.0.0\\Windows.Foundation.FoundationContract.winmd"
+                /reference "$ENV{WindowsSdkDir}References\\$ENV{WindowsSdkVersion}Windows.Foundation.UniversalApiContract\\19.0.0.0\\Windows.Foundation.UniversalApiContract.winmd"
+                /out "${CMAKE_CURRENT_SOURCE_DIR}\\WinMetadata"
+                ${IDL_FILE}
+            RESULT_VARIABLE MIDL_RESULT
+            ERROR_VARIABLE MIDL_ERROR)
+    endif()
+    
+    if(NOT MIDL_RESULT EQUAL 0)
+        message(FATAL_ERROR "${MIDL_ERROR}")
+    endif()
+endforeach()
+
+execute_process(
+    COMMAND cppwinrt
+        -prefix
+        -pch .
+        -input "${CMAKE_CURRENT_SOURCE_DIR}\\WinMetadata"
+        -reference sdk
+        -component "${CMAKE_CURRENT_SOURCE_DIR}\\Generated Files\\sources"
+        -out "${CMAKE_CURRENT_SOURCE_DIR}\\Generated Files")
+
+file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
+)
+
+file(GLOB WINRT_FILES
+    "${CMAKE_CURRENT_SOURCE_DIR}/Generated Files/*.cpp" 
+    "${CMAKE_CURRENT_SOURCE_DIR}/Generated Files/winrt/*.cpp" 
+    "${CMAKE_CURRENT_SOURCE_DIR}/Generated Files/winrt/impl/*.cpp" 
+)
+
+add_library(WinDurango.Kinect SHARED ${SOURCES} ${WINRT_FILES} WinDurango.Kinect.def)
+
+target_include_directories(WinDurango.Kinect BEFORE PUBLIC
+    "$ENV{WindowsSdkDir}Include/$ENV{WindowsSdkVersion}/cppwinrt"
+)
+
+target_include_directories(WinDurango.Kinect PUBLIC
+    "${CMAKE_CURRENT_SOURCE_DIR}/include"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/WinDurango.Kinect"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/WinDurango.Kinect/Windows/Kinect"
+    "${CMAKE_CURRENT_SOURCE_DIR}/Generated Files"
+    "${CMAKE_SOURCE_DIR}/projects/WinDurango.Common/include"
+)
+
+target_link_directories(WinDurango.Kinect PRIVATE 
+    "${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-windows/lib"
+    "${CMAKE_SOURCE_DIR}/build/vcpkg_installed/x64-windows/lib"
+)
+
+target_link_libraries(WinDurango.Kinect PRIVATE WinDurango.Common windowsapp runtimeobject unofficial::kinectsdk2::kinectsdk2)
+
+target_compile_definitions(WinDurango.Kinect PUBLIC
+    WINDURANGO_WINRT_COMPILER_NAME="${CMAKE_CXX_COMPILER_ID}"
+    WINDURANGO_WINRT_PLATFORM_NAME="${CMAKE_SYSTEM_NAME}"
+    WINDURANGO_WINRT_PLATFORM_ARCH="${CMAKE_SYSTEM_PROCESSOR}"
+    WINDURANGO_WINRT_VERSION="${PROJECT_VERSION}${VERSION_SUFFIX}"
+    WINDURANGO_WINRT_RC_VERSION=${PROJECT_VERSION_MAJOR},${PROJECT_VERSION_MINOR},${PROJECT_VERSION_PATCH}
+)
+
+set_target_properties(WinDurango.Kinect PROPERTIES LINKER_LANGUAGE CXX)
+
+target_compile_definitions(WinDurango.Kinect PRIVATE WINRT_DLL WIN32_LEAN_AND_MEAN WINRT_LEAN_AND_MEAN)
+
+if (WINRT_USE_CROSS_PLATFORM STREQUAL ON)
+    target_link_libraries(WinDurango.Kinect PUBLIC WinDurango.Implementation.Native)
+    target_compile_definitions(WinDurango.Kinect PUBLIC WINRT_CROSS_PLATFORM)
+else()
+    target_link_libraries(WinDurango.Kinect PUBLIC WinDurango.Implementation.WinRT)
+endif()
+
+set_target_properties(WinDurango.Kinect PROPERTIES
+    OUTPUT_NAME "windows.kinect"
+)

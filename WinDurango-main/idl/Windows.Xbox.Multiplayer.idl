@@ -1,0 +1,231 @@
+import "Windows.Xbox.System.idl";
+
+namespace Windows.Xbox.Multiplayer
+{
+    enum PartyErrorStatus {
+        InternalError = -2016673791,
+        BadToken = -2016673790,
+        InvalidSecureDeviceAddress = -2016673787,
+        EmptyParty = -2016673785,
+        PartyActionRestricted = -2016673784,
+        PartyAlreadyInTitle = -2016673783,
+        QualityOfSerivceFailed = -2016673782,
+        PartyJoinFailure = -2016673781,
+    };
+
+    // From @Zombie
+    enum SuppressGameSessionReadyToastMode
+    {
+        WhenTitleIsInFocus,
+        Always,
+    };
+
+    enum MatchStatus
+    {
+        Expired = -16,
+        Canceled = -15,
+        None = -1,
+        Searching = 0,
+        Found = 1,
+    };
+
+    enum SessionJoinability
+    {
+        InviteOnly = 0x0,
+        JoinableByFriends = 0x1,
+        Closed = 0x2,
+    };
+
+    [flags]
+    enum PartyFlags
+    {
+        PartyViewDefault = 0x0,
+    };
+
+    // From @Zombie
+    static runtimeclass PartyConfig
+    {
+        [static_name("IPartyConfigStatics_SuppressGameSessionReadyToast", 2FCEC780-2E70-437A-AE46-72298AE2BAC2)]
+        {
+            static Boolean SuppressGameSessionReadyToast { get; set; };
+        }
+
+        [static_name("ISuppressGameSessionReadyToast2", 6938FC66-ED0C-4B86-A240-009DA675A0EC)]
+        {
+            static SuppressGameSessionReadyToastMode SuppressGameSessionReadyToastMode { get; set; };
+        }
+    }
+
+    [interface_name("IMultiplayerSessionReference", 77023BD9-8452-4FE0-886B-4229DD69972B)]
+    runtimeclass MultiplayerSessionReference
+    {
+        MultiplayerSessionReference();
+        String SessionName { get; };
+        String ServiceConfigurationId { get; };
+        String SessionTemplateName { get; };
+    }
+
+    [interface_name("IMultiplayerSessionReferenceFactory", 9CF4368E-8E57-437D-BE98-BE6B5CDC5422)]
+    runtimeclass MultiplayerSessionReferenceFactory
+    {
+        MultiplayerSessionReference CreateMultiplayerSessionReference(String unk, String unka, String unkb);
+    }
+
+    [interface_name("IPartyChatMember", 34D5D8B2-7D7D-4598-8A91-8158B31FF3F3)]
+    runtimeclass PartyChatMember
+    {
+        String XboxUserId { get; };
+        UInt8 IsLocal { get; };
+    }
+
+    [interface_name("IPartyChatView", 72AB8ECF-1A34-459B-973A-8C183714642B)]
+    runtimeclass PartyChatView
+    {
+        Windows.Foundation.Collections.IVectorView<PartyChatMember> Members { get; };
+    }
+
+    [interface_name("IPartyMember", AFB8F2BD-A436-4813-9AA5-3483D69BD640)]
+    runtimeclass PartyMember
+    {
+        String XboxUserId { get; };
+        Boolean IsLocal { get; };
+        Windows.Foundation.DateTime JoinTime { get; };
+    }
+
+    [interface_name("IGamePlayer", 0CA72957-9BD8-4240-9681-5B3500740C46)]
+    runtimeclass GamePlayer
+    {
+        String XboxUserId { get; };
+        Windows.Foundation.DateTime LastInvitedTime { get; };
+        Windows.Foundation.DateTime PartyJoinTime { get; };
+    }
+
+    [interface_name("IGamePlayerDeviceGroup", 610D87A8-3FB4-4AF9-A185-6D6A96F7B4E0)]
+    runtimeclass GamePlayerDeviceGroup
+    {
+        Windows.Foundation.Collections.IVectorView<GamePlayer> Players { get; };
+    }
+
+    [interface_name("IGameSessionReadyEventArgs", A6979C26-EE30-4DA3-A130-FB81ACABA8EA)]
+    runtimeclass GameSessionReadyEventArgs
+    {
+        MultiplayerSessionReference GameSession { get; };
+    }
+
+    [interface_name("IPartyStateChangedEventArgs", 8FC3CA09-8091-4465-8726-25AC8EA850D4)]
+    runtimeclass PartyStateChangedEventArgs
+    {
+        PartyView PartyView { get; };
+    }
+
+    [interface_name("IPartyRosterChangedEventArgs", CA436967-5806-49BE-A165-438681C87382)]
+    runtimeclass PartyRosterChangedEventArgs
+    {
+        Windows.Foundation.Collections.IVectorView<String> AddedMembers { get; };
+        Windows.Foundation.Collections.IVectorView<String> AddedReservedMembers { get; };
+        Windows.Foundation.Collections.IVectorView<String> RemovedMembers { get; };
+        Windows.Foundation.Collections.IVectorView<String> RemovedReservedMembers { get; };
+        PartyView PartyView { get; };
+    }
+
+    [interface_name("IMatchStatusChangedEventArgs", 593EDA17-1EE7-40DF-A0C3-76D74CD7AE49)]
+    runtimeclass MatchStatusChangedEventArgs
+    {
+        MultiplayerSessionReference MatchSession { get; };
+        MatchStatus MatchStatus { get; };
+    }
+
+    [interface_name("IGamePlayersChangedEventArgs", 60DE3CE1-5EA2-4ABD-B87F-DE711A815EF4)]
+    runtimeclass GamePlayersChangedEventArgs
+    {
+        MultiplayerSessionReference GameSession { get; };
+        Windows.Foundation.Collections.IVectorView<GamePlayer> AvailablePlayers { get; };
+        Windows.Foundation.Collections.IVectorView<GamePlayerDeviceGroup> AvailablePlayersGroupedByDevice { get; };
+    }
+
+    [interface_name("IPartyMemberDeviceGroup", 4BE5D684-29C9-48F2-AC8B-083254C94BF2)]
+    runtimeclass PartyMemberDeviceGroup
+    {
+        Windows.Foundation.Collections.IVectorView<PartyMember> Members { get; };
+    }
+
+    [interface_name("IUserPartyAssociation", B25D6C22-A2E6-4652-8759-2E0E81316E90)]
+    runtimeclass UserPartyAssociation
+    {
+        Windows.Foundation.Collections.IVectorView<String> QueriedXboxUserIds { get; };
+        String PartyId { get; };
+    }
+
+    runtimeclass PartyView
+    {
+        [interface_name("IPartyView", B9C0121F-0236-4FF0-9AF9-F28CDA93F643)]
+        {
+            Windows.Foundation.Collections.IVectorView<String> ReservedMembers { get; };
+            Windows.Foundation.Collections.IVectorView<PartyMember> Members { get; };
+            Windows.Foundation.Collections.IVectorView<PartyMemberDeviceGroup> MembersGroupedByDevice { get; };
+            MultiplayerSessionReference MatchSession { get; };
+            MultiplayerSessionReference GameSession { get; };
+            Boolean IsPartyInAnotherTitle { get; };
+        }
+
+        [interface_name("IPartyView2", 6D6A525B-133F-4DBB-9E35-ED39F6DD7D12)]
+        {
+            static SuppressGameSessionReadyToastMode SuppressGameSessionReadyToastMode { get; set; };
+        }
+    }
+
+    [static_name("IPartyChatStatics", CC1BCF39-99F3-42A2-AFB6-CDC07B29755F)]
+    runtimeclass PartyChat
+    {
+        static Windows.Foundation.IAsyncOperation<PartyChatView> GetPartyChatViewAsync();
+        static event Windows.Foundation.EventHandler<Object> PartyChatViewChanged;
+        static Boolean IsPartyChatActive { get; };
+        static Boolean IsPartyChatSuppressed { get; set; };
+        static event Windows.Foundation.EventHandler<Boolean> IsPartyChatActiveChanged;
+        static event Windows.Foundation.EventHandler<Boolean> IsPartyChatSuppressedChanged;
+    }
+
+    static runtimeclass Party
+    {
+        [static_name("IPartyStatics", E6110C4C-3660-4230-9880-208B149A3CA4)]
+        {
+            static Windows.Foundation.IAsyncAction RegisterGameSessionAsync(Windows.Xbox.System.User actingUser, MultiplayerSessionReference sessionReference);
+            static Windows.Foundation.IAsyncAction RegisterMatchSessionAsync(Windows.Xbox.System.User actingUser, MultiplayerSessionReference sessionReference);
+            static Windows.Foundation.IAsyncAction InviteToPartyAsync(Windows.Xbox.System.User actingUser, Windows.Foundation.Collections.IVectorView<String> usersToInvite);
+            static Windows.Foundation.IAsyncOperation<PartyView> GetPartyViewAsync();
+            static Windows.Foundation.IAsyncAction AddLocalUsersAsync(Windows.Xbox.System.User actingUser, Windows.Foundation.Collections.IVectorView<Windows.Xbox.System.User> localUsersToAdd);
+            static Windows.Foundation.IAsyncAction PullInactivePlayersAsync(Windows.Xbox.System.User actingUser, MultiplayerSessionReference sessionReference);
+            static Windows.Foundation.IAsyncAction PullReservedPlayersAsync(Windows.Xbox.System.User actingUser, MultiplayerSessionReference sessionReference);
+            static Windows.Foundation.IAsyncOperation<Windows.Foundation.Collections.IVectorView<GamePlayer> > GetAvailableGamePlayersAsync(Windows.Xbox.System.User actingUser);
+            static Windows.Foundation.IAsyncOperation<Windows.Foundation.Collections.IVectorView<GamePlayerDeviceGroup> > GetAvailableGamePlayersGroupedByDeviceAsync(Windows.Xbox.System.User actingUser);
+            static Windows.Foundation.IAsyncAction SwitchPartyTitleAsync(Windows.Xbox.System.User actingUser);
+            static event Windows.Foundation.EventHandler<GameSessionReadyEventArgs> GameSessionReady;
+            static event Windows.Foundation.EventHandler<PartyStateChangedEventArgs> PartyStateChanged;
+            static event Windows.Foundation.EventHandler<PartyRosterChangedEventArgs> PartyRosterChanged;
+            static event Windows.Foundation.EventHandler<MatchStatusChangedEventArgs> MatchStatusChanged;
+            static event Windows.Foundation.EventHandler<GamePlayersChangedEventArgs> GamePlayersChanged;
+        }
+
+        [static_name("IPartyStatics2", 87521843-2298-43C4-81F1-C7C50AB794E1)]
+        {
+            static Windows.Foundation.IAsyncOperation<PartyView> GetPartyViewAsyncEx(PartyFlags flags);
+        }
+
+        [static_name("IPartyStatics3", 15946429-17A1-4FDF-9D67-766ED0F4B868)]
+        {
+            static Windows.Foundation.IAsyncAction RemoveLocalUsersAsync(Windows.Foundation.Collections.IVectorView<Windows.Xbox.System.User> localUsersToRemove);
+            static String PartyId { get; };
+            static Windows.Foundation.IAsyncAction DisassociateGameSessionAsync(Windows.Xbox.System.User actingUser, MultiplayerSessionReference sessionReferenceToDisassociate);
+        }
+
+        [static_name("IPartyStatics4", 4B907F32-9165-4193-9CCE-1D5CCDDD060E)]
+        {
+            static Windows.Foundation.IAsyncAction RegisterGameSessionCompareAsync(Windows.Xbox.System.User actingUser, MultiplayerSessionReference sessionReference, MultiplayerSessionReference sessionReferenceComparand);
+            static Windows.Foundation.IAsyncAction RegisterMatchSessionCompareAsync(Windows.Xbox.System.User actingUser, MultiplayerSessionReference sessionReference, MultiplayerSessionReference sessionReferenceComparand);
+            static Windows.Foundation.IAsyncOperation<Windows.Foundation.Collections.IVectorView<UserPartyAssociation> > GetUserPartyAssociationsAsync(Windows.Xbox.System.User actingUser, Windows.Foundation.Collections.IVectorView<String> targetXboxUserIds);
+            static Windows.Foundation.IAsyncOperation<PartyView> GetPartyViewByPartyIdAsync(Windows.Xbox.System.User actingUser, String partyId);
+            static Windows.Foundation.IAsyncAction JoinPartyByIdAsync(Windows.Xbox.System.User actingUser, String partyId);
+            static SessionJoinability Joinability { get; set; };
+        }
+    }
+}

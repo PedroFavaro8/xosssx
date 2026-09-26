@@ -1,0 +1,72 @@
+//All the info came from the Unity PDB.
+//Since it doens't count with all definitions,
+//some of them are simply placeholders and should
+//not represent something correct at all.
+namespace Windows.Xbox.Media
+{
+    // Windows.Media.MediaPlaybackStatus
+    enum GamePlaybackStatus
+    {
+        Closed,
+        Changing,
+        Stopped,
+        Playing,
+        Paused
+    };
+
+    // Unity PDB
+    // Differs from Windows.Media.SystemMediaTransportControlsButton
+    enum GameTransportControlsButton
+    {
+        Play,
+        Pause,
+        Menu,
+        View,
+        Back,
+        MaxButtons
+    };
+
+    // Windows.Media.SystemMediaTransportControlsProperty
+    enum GameTransportControlsProperty
+    {
+        SoundLevel
+    };
+
+    // Windows.Media.SoundLevel
+    enum SoundLevel
+    {
+        Muted,
+        Low,
+        Full
+    };
+
+    [interface_name("IGameTransportControlsPropertyChangedEventArgs", D0CA0936-339B-4CB3-8EEB-737607F56E08)]
+    runtimeclass GameTransportControlsPropertyChangedEventArgs
+    {
+        Windows.Xbox.Media.GameTransportControlsProperty Property { get; };
+    }
+
+    [interface_name("IGameTransportControlsButtonPressedEventArgs", 9BD12C1F-24FE-4790-8C2C-8FB6A5727BC2)]
+    runtimeclass GameTransportControlsButtonPressedEventArgs
+    {
+        Windows.Xbox.Media.GameTransportControlsButton Button { get; };
+    }
+
+    [interface_name("IGameTransportControls", F5BA60D7-9303-44CD-AC0C-4E532702CD00)]
+    runtimeclass GameTransportControls
+    {
+        GameTransportControls();
+        String Title { get; set; };
+        String Subtitle { get; set; };
+        Windows.Xbox.Media.GamePlaybackStatus PlaybackStatus { get; set; };
+        Windows.Xbox.Media.SoundLevel SoundLevel { get; };
+        Boolean IsEnabled { get; set; };
+        Boolean IsPlayEnabled { get; set; };
+        Boolean IsPauseEnabled { get; set; };
+        Boolean IsMenuEnabled { get; set; };
+        Boolean IsViewEnabled { get; set; };
+        Boolean IsBackEnabled { get; set; };
+        event Windows.Foundation.TypedEventHandler<GameTransportControls, GameTransportControlsButtonPressedEventArgs> ButtonPressed;
+        event Windows.Foundation.TypedEventHandler<GameTransportControls, GameTransportControlsPropertyChangedEventArgs> PropertyChanged;
+    }
+}

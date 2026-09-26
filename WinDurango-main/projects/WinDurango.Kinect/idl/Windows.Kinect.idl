@@ -1,0 +1,811 @@
+namespace Windows.Kinect 
+{
+    enum Activity
+    {
+        EyeLeftClosed,
+        EyeRightClosed,
+        MouthOpen,
+        MouthMoved,
+        LookingAway,
+    };
+
+    enum Appearance
+    {
+        WearingGlasses,
+    };
+
+    [flags]
+    enum AudioBeamFrameFlags
+    {
+        None = 0x0,
+        SuppressBodyCorrelation = 0x1,
+    };
+
+    enum AudioBeamMode
+    {
+        Automatic,
+        Manual,
+    };
+
+    enum ColorImageFormat
+    {
+        None,
+        Rgba,
+        Yuv,
+        Bgra,
+        Bayer,
+        Yuy2,
+    };
+
+    [flags]
+    enum DepthFrameFlags
+    {
+        None = 0U,
+        NearOccluded = 1U,
+        Saturated = 2U,
+    };
+
+    enum DetectionResult
+    {
+        Unknown,
+        No,
+        Maybe,
+        Yes,
+    };
+
+    enum DeviceStatus
+    {
+        ServiceDisconnected,
+        Disconnected,
+        Connected,
+        Initializing,
+        HardwareError,
+        FirmwareUpdateRequired,
+        FirmwareUpdateInProgress,
+        SoftwareError,
+    };
+
+    enum EngagementMode
+    {
+        Normal,
+        Off,
+        Media,
+    };
+
+    enum EventPriority
+    {
+        Normal,
+        High,
+        Count,
+    };
+
+    enum Expression
+    {
+        Neutral,
+        Happy,
+    };
+
+    enum FrameCapturedStatus
+    {
+        Unknown,
+        Queued,
+        Dropped,
+    };
+
+    [flags]
+    enum FrameEdges
+    {
+        None = 0x0,
+        Right = 0x1,
+        Left = 0x2,
+        Top = 0x4,
+        Bottom = 0x8,
+    };
+
+    [flags]
+    enum FrameInternalSourceTypes
+    {
+        None = 0x0,
+        Color = 0x1,
+        Infrared = 0x2,
+        LongExposureInfrared = 0x4,
+        Depth = 0x8,
+        BodyIndex = 0x10,
+        Body = 0x20,
+        Audio = 0x40,
+        OpaqueMachineLearning = 0x80,
+        Interaction = 0x100,
+        TrackableControllers = 0x200,
+    };
+
+    [flags]
+    enum FrameSourceTypes
+    {
+        None = 0x0,
+        Color = 0x1,
+        Infrared = 0x2,
+        LongExposureInfrared = 0x4,
+        Depth = 0x8,
+        BodyIndex = 0x10,
+        Body = 0x20,
+        Audio = 0x40,
+    };
+
+    enum HandState
+    {
+        Unknown,
+        NotTracked,
+        Open,
+        Closed,
+        Lasso,
+    };
+
+    enum HandType
+    {
+        Left,
+        Right,
+    };
+
+    enum ImageSize
+    {
+        None,
+        Size960x540,
+        Size480x270,
+        Size320x180,
+        Size240x134,
+    };
+
+    [flags]
+    enum InfraredFrameFlags
+    {
+        None = 0x0,
+        NearOccluded = 0x1,
+        Saturated = 0x2,
+    };
+
+    enum InteractionType
+    {
+        None,
+        Manipulating,
+        Pressing,
+        Pressed,
+    };
+
+    enum JointType
+    {
+        SpineBase,
+        SpineMid,
+        Neck,
+        Head,
+        ShoulderLeft,
+        ElbowLeft,
+        WristLeft,
+        HandLeft,
+        ShoulderRight,
+        ElbowRight,
+        WristRight,
+        HandRight,
+        HipLeft,
+        KneeLeft,
+        AnkleLeft,
+        FootLeft,
+        HipRight,
+        KneeRight,
+        AnkleRight,
+        FootRight,
+        SpineShoulder,
+        HandTipLeft,
+        ThumbLeft,
+        HandTipRight,
+        ThumbRight,
+    };
+
+    enum KinectAudioCalibrationState
+    {
+        Unknown,
+        CalibrationRequired,
+        Calibrated,
+    };
+
+    [flags]
+    enum KinectCapabilities
+    {
+        None = 0x0,
+        Vision = 0x1,
+        Audio = 0x2,
+        Face = 0x4,
+        Expressions = 0x8,
+        Gamechat = 0x10,
+    };
+
+    [flags]
+    enum KinectCapabilitiesInternal
+    {
+        Set = 0x80000000,
+    };
+
+    enum KinectSensorAccessMode
+    {
+        None,
+        Exclusive,
+        Shared,
+    };
+
+    enum SuppressibleStreamTypes
+    {
+        None = 0x0,
+        Body = 0x1,
+        Audio = 0x2,
+        Interaction = 0x4,
+        SystemGesture = 0x8,
+    };
+
+    enum SystemEngagementMode
+    {
+        None,
+        SystemOnePerson,
+        SystemTwoPerson,
+        ManualOnePerson,
+        ManualTwoPerson,
+    };
+
+    enum TrackingConfidence
+    {
+        Low,
+        High,
+    };
+
+    enum TrackingState
+    {
+        NotTracked,
+        Inferred,
+        Tracked,
+    };
+
+    struct ColorSpacePoint
+    {
+        Single X;
+        Single Y;
+    };
+
+    struct CameraSpacePoint
+    {
+        Single X;
+        Single Y;
+        Single Z;
+    };
+
+    struct DepthSpacePoint
+    {
+        Single X;
+        Single Y;
+    };
+
+    struct Joint
+    {
+        JointType JointType;
+        CameraSpacePoint Position;
+        TrackingState TrackingState;
+    };
+
+    struct Vector4
+    {
+        Single X;
+        Single Y;
+        Single Z;
+        Single W;
+    };
+
+    struct JointOrientation
+    {
+        JointType JointType;
+        Vector4 Orientation;
+    };
+
+    struct CameraIntrinsics
+    {
+        Single FocalLengthX;
+        Single FocalLengthY;
+        Single PrincipalPointX;
+        Single PrincipalPointY;
+        Single RadialDistortionSecondOrder;
+        Single RadialDistortionFourthOrder;
+        Single RadialDistortionSixthOrder;
+    };
+
+    [interface_name("IIsAvailableChangedEventArgs", 9C9B610E-8FE9-429E-A7F9-351C7F7219EC)]
+    runtimeclass IsAvailableChangedEventArgs
+    {
+        Boolean IsAvailable { get; };
+    };
+
+    [interface_name("IFrameCapturedEventArgs", 3CF8A546-A0F1-4E0D-BDD7-465CC1672216)]
+    runtimeclass FrameCapturedEventArgs
+    {
+        FrameSourceTypes FrameType { get; };
+        FrameCapturedStatus FrameStatus { get; };
+        Windows.Foundation.TimeSpan RelativeTime { get; };
+    };
+
+    [interface_name("IColorFrameArrivedEventArgs", 3E32AC97-9FC3-4A88-88C3-2C68133FBA64)]
+    runtimeclass ColorFrameArrivedEventArgs
+    {
+        ColorFrameReference FrameReference { get; };
+    };
+
+    [interface_name("IDepthFrameArrivedEventArgs", AC9B1F71-1CB1-4E24-A2E1-91A0EAF490E8)]
+    runtimeclass DepthFrameArrivedEventArgs
+    {
+        DepthFrameReference FrameReference { get; };
+    };
+
+    [interface_name("IBodyFrameArrivedEventArgs", 0314A4B1-C766-47DF-9BC5-8D1D86D3EB79)]
+    runtimeclass BodyFrameArrivedEventArgs
+    {
+        BodyFrameReference FrameReference { get; };
+    };
+
+    [interface_name("IBodyIndexFrameArrivedEventArgs", C412808B-FDE6-457E-92F1-6B2E8390BB42)]
+    runtimeclass BodyIndexFrameArrivedEventArgs
+    {
+        BodyIndexFrameReference FrameReference { get; };
+    };
+
+    [interface_name("IInfraredFrameArrivedEventArgs", 904D021F-33D2-465D-B003-3BDE344426E3)]
+    runtimeclass InfraredFrameArrivedEventArgs
+    {
+        InfraredFrameReference FrameReference { get; };
+    };
+
+    [interface_name("ILongExposureInfraredFrameArrivedEventArgs", 17144E32-0440-4BE2-BB56-01545F81A2F6)]
+    runtimeclass LongExposureInfraredFrameArrivedEventArgs
+    {
+        LongExposureInfraredFrameReference FrameReference { get; };
+    };
+
+    [interface_name("IAudioBeamFrameArrivedEventArgs", BB2C8BF2-C93B-4F34-93AB-3520132CAE72)]
+    runtimeclass AudioBeamFrameArrivedEventArgs
+    {
+        AudioBeamFrameReference FrameReference { get; };
+    };
+
+    [interface_name("IMultiSourceFrameArrivedEventArgs", 49B54065-38A3-4631-881A-073DB2B729BE)]
+    runtimeclass MultiSourceFrameArrivedEventArgs
+    {
+        MultiSourceFrameReference FrameReference { get; };
+    };
+
+    [interface_name("ICoordinateMappingChangedEventArgs", FB521EC4-3052-47DD-A511-4D23DBBBC7F3)]
+    runtimeclass CoordinateMappingChangedEventArgs
+    {
+    };
+
+    [interface_name("IColorFrameReference", 630D4C33-C18B-474D-B27E-F43B1922BEF4)]
+    runtimeclass ColorFrameReference
+    {
+        ColorFrame AcquireFrame();
+        Windows.Foundation.TimeSpan RelativeTime { get; };
+    };
+
+    [interface_name("IDepthFrameReference", 6B6BB4C0-2838-4B6E-9EA2-E8F2C1260A66)]
+    runtimeclass DepthFrameReference
+    {
+        DepthFrame AcquireFrame();
+        Windows.Foundation.TimeSpan RelativeTime { get; };
+    };
+
+    [interface_name("IBodyFrameReference", B72A9F9B-08E3-4C7B-BA33-05CC667FB7B2)]
+    runtimeclass BodyFrameReference
+    {
+        BodyFrame AcquireFrame();
+        Windows.Foundation.TimeSpan RelativeTime { get; };
+    };
+
+    [interface_name("IBodyIndexFrameReference", 0A7ED444-EE5C-406B-9D17-FB88C2F4FEAC)]
+    runtimeclass BodyIndexFrameReference
+    {
+        BodyIndexFrame AcquireFrame();
+        Windows.Foundation.TimeSpan RelativeTime { get; };
+    };
+
+    [interface_name("IInfraredFrameReference", 49386081-23B1-49A3-844A-E6C9DED64815)]
+    runtimeclass InfraredFrameReference
+    {
+        InfraredFrame AcquireFrame();
+        Windows.Foundation.TimeSpan RelativeTime { get; };
+    };
+
+    [interface_name("ILongExposureInfraredFrameReference", 711C0F3C-C69A-4DAA-82BB-D6A4BB69CBE9)]
+    runtimeclass LongExposureInfraredFrameReference
+    {
+        LongExposureInfraredFrame AcquireFrame();
+        Windows.Foundation.TimeSpan RelativeTime { get; };
+    };
+
+    [interface_name("IAudioBeamFrameReference", 6AF4A61A-C99F-470B-9486-033DD82F79F8)]
+    runtimeclass AudioBeamFrameReference
+    {
+        Windows.Foundation.Collections.IVectorView<AudioBeamFrame> AcquireBeamFrames();
+        Windows.Foundation.TimeSpan RelativeTime { get; };
+    };
+
+    [interface_name("IMultiSourceFrameReference", A215DFD2-F6AA-4FF9-ACFE-0232190CAB83)]
+    runtimeclass MultiSourceFrameReference
+    {
+        MultiSourceFrame AcquireFrame();
+    };
+
+    [interface_name("IFrameDescription", D5E2A26D-C1C3-429E-8DD4-3308CF12DAF5)]
+    runtimeclass FrameDescription
+    {
+        Int32 Width { get; };
+        Int32 Height { get; };
+        Single HorizontalFieldOfView { get; };
+        Single VerticalFieldOfView { get; };
+        Single DiagonalFieldOfView { get; };
+        UInt32 LengthInPixels { get; };
+        UInt32 BytesPerPixel { get; };
+    };
+
+    [interface_name("IColorCameraSettings", C2281DA3-1813-4DDE-9EEE-8EECB9D1F0A2)]
+    runtimeclass ColorCameraSettings
+    {
+        Windows.Foundation.TimeSpan ExposureTime { get; };
+        Windows.Foundation.TimeSpan FrameInterval { get; };
+        Single Gain { get; };
+        Single Gamma { get; };
+    };
+
+    [interface_name("IColorFrame", 1329B2BC-8432-4624-8DA0-1529CE6BB6ED)]
+    runtimeclass ColorFrame
+    {
+        ColorImageFormat RawColorImageFormat { get; };
+        FrameDescription FrameDescription { get; };
+        UInt8[] CopyRawFrameDataToArray();
+        void CopyRawFrameDataToBuffer(Windows.Storage.Streams.IBuffer buffer);
+        Windows.Storage.Streams.IBuffer LockRawImageBuffer();
+        UInt8[] CopyConvertedFrameDataToArray(ColorImageFormat colorFormat);
+        void CopyConvertedFrameDataToBuffer(Windows.Storage.Streams.Buffer buffer, ColorImageFormat colorFormat);
+        FrameDescription CreateFrameDescription(ColorImageFormat format);
+        ColorCameraSettings ColorCameraSettings { get; };
+        Windows.Foundation.TimeSpan RelativeTime { get; };
+        ColorFrameSource ColorFrameSource { get; };
+    };
+
+    [interface_name("IColorFrameReader", CB7A5CD7-3061-4DC9-A803-29A6515E57BB)]
+    runtimeclass ColorFrameReader
+    {
+        event Windows.Foundation.TypedEventHandler<ColorFrameReader, ColorFrameArrivedEventArgs> FrameArrived;
+        ColorFrame AcquireLatestFrame();
+        Boolean IsPaused { get; set; };
+        ColorFrameSource ColorFrameSource { get; };
+    };
+
+    [interface_name("IColorFrameSource", 6DE5831C-E863-4321-B245-ED21A43C1F36)]
+    runtimeclass ColorFrameSource
+    {
+        event Windows.Foundation.TypedEventHandler<ColorFrameSource, FrameCapturedEventArgs> FrameCaptured;
+        Boolean IsActive { get; };
+        ColorFrameReader OpenReader();
+        FrameDescription CreateFrameDescription(ColorImageFormat format);
+        FrameDescription FrameDescription { get; };
+        KinectSensor KinectSensor { get; };
+    };
+
+    [interface_name("IDepthFrame", 9EED0B41-2A4C-43D6-84CD-F09358ACD747)]
+    runtimeclass DepthFrame
+    {
+        UInt16[] CopyFrameDataToArray();
+        void CopyFrameDataToBuffer(Windows.Storage.Streams.IBuffer buffer);
+        Windows.Storage.Streams.IBuffer LockImageBuffer();
+        FrameDescription FrameDescription { get; };
+        Windows.Foundation.TimeSpan RelativeTime { get; };
+        DepthFrameSource DepthFrameSource { get; };
+        UInt16 DepthMinReliableDistance { get; };
+        UInt16 DepthMaxReliableDistance { get; };
+    };
+
+    [interface_name("IDepthFrameReader", DB5E576C-887A-4C21-9E5D-A163747AFA7C)]
+    runtimeclass DepthFrameReader
+    {
+        event Windows.Foundation.TypedEventHandler<DepthFrameReader, DepthFrameArrivedEventArgs> FrameArrived;
+        DepthFrame AcquireLatestFrame();
+        Boolean IsPaused { get; set; };
+        DepthFrameSource DepthFrameSource { get; };
+    };
+
+    [interface_name("IDepthFrameSource", EDA79878-C3D5-41B3-B456-F08AA0B57AB6)]
+    runtimeclass DepthFrameSource
+    {
+        event Windows.Foundation.TypedEventHandler<DepthFrameSource, FrameCapturedEventArgs> FrameCaptured;
+        Boolean IsActive { get; };
+        DepthFrameReader OpenReader();
+        UInt16 DepthMinReliableDistance { get; };
+        UInt16 DepthMaxReliableDistance { get; };
+        FrameDescription FrameDescription { get; };
+        KinectSensor KinectSensor { get; };
+    };
+
+    [interface_name("IBody", 47DF53E7-3AAF-44A3-92CC-73167A771D91)]
+    runtimeclass Body
+    {
+        Body();
+        Windows.Foundation.Collections.IMapView<JointType, Joint> Joints { get; };
+        Windows.Foundation.Collections.IMapView<JointType, JointOrientation> JointOrientations { get; };
+        DetectionResult Engaged { get; };
+        Windows.Foundation.Collections.IMapView<Expression, DetectionResult> Expressions { get; };
+        Windows.Foundation.Collections.IMapView<Activity, DetectionResult> Activities { get; };
+        Windows.Foundation.Collections.IMapView<Appearance, DetectionResult> Appearance { get; };
+        HandState HandLeftState { get; };
+        TrackingConfidence HandLeftConfidence { get; };
+        HandState HandRightState { get; };
+        TrackingConfidence HandRightConfidence { get; };
+        FrameEdges ClippedEdges { get; };
+        UInt64 TrackingId { get; };
+        Boolean IsTracked { get; };
+        Boolean IsRestricted { get; };
+        Windows.Foundation.Point Lean { get; };
+        TrackingState LeanTrackingState { get; };
+    };
+
+    [interface_name("IBodyFrame", D9D74F03-7CA5-4816-A3E3-86899CE26BA5)]
+    runtimeclass BodyFrame
+    {
+        void GetAndRefreshBodyData(Windows.Foundation.Collections.IVector<Body> bodies);
+        Int32 BodyCount { get; };
+        Vector4 FloorClipPlane { get; };
+        Windows.Foundation.TimeSpan RelativeTime { get; };
+        BodyFrameSource BodyFrameSource { get; };
+    };
+
+    [interface_name("IBodyFrameReader", 04D449DD-6BCD-4AD0-96C4-3598C0BA15B8)]
+    runtimeclass BodyFrameReader
+    {
+        event Windows.Foundation.TypedEventHandler<BodyFrameReader, BodyFrameArrivedEventArgs> FrameArrived;
+        BodyFrame AcquireLatestFrame();
+        Boolean IsPaused { get; set; };
+        BodyFrameSource BodyFrameSource { get; };
+    };
+
+    [interface_name("IBodyFrameSource", F518D955-4BBC-4B95-ABC1-0D11C837FC0B)]
+    runtimeclass BodyFrameSource
+    {
+        event Windows.Foundation.TypedEventHandler<BodyFrameSource, FrameCapturedEventArgs> FrameCaptured;
+        Boolean IsActive { get; };
+        Int32 BodyCount { get; };
+        BodyFrameReader OpenReader();
+        KinectSensor KinectSensor { get; };
+        void OverrideHandTracking(UInt64 trackingId);
+        void OverrideAndReplaceHandTracking(UInt64 oldTrackingId, UInt64 newTrackingId);
+    };
+
+    [interface_name("IBodyIndexFrame", 7866057F-C18F-4FFA-8444-4B21AB666BC8)]
+    runtimeclass BodyIndexFrame
+    {
+        UInt8[] CopyFrameDataToArray();
+        void CopyFrameDataToBuffer(Windows.Storage.Streams.IBuffer buffer);
+        Windows.Storage.Streams.IBuffer LockImageBuffer();
+        FrameDescription FrameDescription { get; };
+        Windows.Foundation.TimeSpan RelativeTime { get; };
+        BodyIndexFrameSource BodyIndexFrameSource { get; };
+    };
+
+    [interface_name("IBodyIndexFrameReader", A5B4268A-F30C-4B1C-977E-051C3E281448)]
+    runtimeclass BodyIndexFrameReader
+    {
+        event Windows.Foundation.TypedEventHandler<BodyIndexFrameReader, BodyIndexFrameArrivedEventArgs> FrameArrived;
+        BodyIndexFrame AcquireLatestFrame();
+        Boolean IsPaused { get; set; };
+        BodyIndexFrameSource BodyIndexFrameSource { get; };
+    };
+
+    [interface_name("IBodyIndexFrameSource", 1A141C6B-3ABB-4F97-AE23-3155DC692753)]
+    runtimeclass BodyIndexFrameSource
+    {
+        event Windows.Foundation.TypedEventHandler<BodyIndexFrameSource, FrameCapturedEventArgs> FrameCaptured;
+        Boolean IsActive { get; };
+        BodyIndexFrameReader OpenReader();
+        FrameDescription FrameDescription { get; };
+        KinectSensor KinectSensor { get; };
+    };
+
+    [interface_name("IInfraredFrame", 222CFBCC-CB49-4F33-BA1F-2BD6A1A4E57B)]
+    runtimeclass InfraredFrame
+    {
+        UInt16[] CopyFrameDataToArray();
+        void CopyFrameDataToBuffer(Windows.Storage.Streams.IBuffer buffer);
+        Windows.Storage.Streams.IBuffer LockImageBuffer();
+        FrameDescription FrameDescription { get; };
+        Windows.Foundation.TimeSpan RelativeTime { get; };
+        InfraredFrameSource InfraredFrameSource { get; };
+    };
+
+    [interface_name("IInfraredFrameReader", F2BFA6BC-7F1B-45BB-ABDF-9B5FA7CD3C19)]
+    runtimeclass InfraredFrameReader
+    {
+        event Windows.Foundation.TypedEventHandler<InfraredFrameReader, InfraredFrameArrivedEventArgs> FrameArrived;
+        InfraredFrame AcquireLatestFrame();
+        Boolean IsPaused { get; set; };
+        InfraredFrameSource InfraredFrameSource { get; };
+    };
+
+    [interface_name("IInfraredFrameSource", 641E1BBD-C067-454F-B48B-D2FBD7319290)]
+    runtimeclass InfraredFrameSource
+    {
+        event Windows.Foundation.TypedEventHandler<InfraredFrameSource, FrameCapturedEventArgs> FrameCaptured;
+        Boolean IsActive { get; };
+        InfraredFrameReader OpenReader();
+        FrameDescription FrameDescription { get; };
+        KinectSensor KinectSensor { get; };
+    };
+
+    [interface_name("ILongExposureInfraredFrame", 857CCAE8-FBE6-4B86-9408-D95089706FBA)]
+    runtimeclass LongExposureInfraredFrame
+    {
+        UInt16[] CopyFrameDataToArray();
+        void CopyFrameDataToBuffer(Windows.Storage.Streams.IBuffer buffer);
+        Windows.Storage.Streams.IBuffer LockImageBuffer();
+        FrameDescription FrameDescription { get; };
+        Windows.Foundation.TimeSpan RelativeTime { get; };
+        LongExposureInfraredFrameSource LongExposureInfraredFrameSource { get; };
+    };
+
+    [interface_name("ILongExposureInfraredFrameReader", 2239D126-7657-4D27-ABF0-1DD535A7AB50)]
+    runtimeclass LongExposureInfraredFrameReader
+    {
+        event Windows.Foundation.TypedEventHandler<LongExposureInfraredFrameReader, LongExposureInfraredFrameArrivedEventArgs> FrameArrived;
+        LongExposureInfraredFrame AcquireLatestFrame();
+        Boolean IsPaused { get; set; };
+        LongExposureInfraredFrameSource LongExposureInfraredFrameSource { get; };
+    };
+
+    [interface_name("ILongExposureInfraredFrameSource", 03C3AC42-E1DC-4726-B53D-DD5CD1AA5828)]
+    runtimeclass LongExposureInfraredFrameSource
+    {
+        event Windows.Foundation.TypedEventHandler<LongExposureInfraredFrameSource, FrameCapturedEventArgs> FrameCaptured;
+        Boolean IsActive { get; };
+        LongExposureInfraredFrameReader OpenReader();
+        FrameDescription FrameDescription { get; };
+        KinectSensor KinectSensor { get; };
+    };
+
+    [interface_name("IAudioBeam", 3993D156-A9EA-4155-B5AC-BE826D63FD0E)]
+    runtimeclass AudioBeam
+    {
+        AudioSource AudioSource { get; };
+        AudioBeamMode AudioBeamMode { get; set; };
+        Single BeamAngle { get; set; };
+        Single BeamAngleConfidence { get; };
+        Windows.Storage.Streams.IInputStream OpenInputStream();
+        Windows.Foundation.TimeSpan RelativeTime { get; };
+    };
+
+    [interface_name("IAudioBodyCorrelation", 6F9B23DE-6D4C-4FEF-BB9D-D975C959C6ED)]
+    runtimeclass AudioBodyCorrelation
+    {
+        UInt64 BodyTrackingId { get; };
+    };
+
+    [interface_name("IAudioBeamSubFrame", 25C61C82-967B-43B7-92D5-A07EB63519F2)]
+    runtimeclass AudioBeamSubFrame
+    {
+        UInt32 FrameLengthInBytes { get; };
+        Windows.Foundation.TimeSpan Duration { get; };
+        Single BeamAngle { get; };
+        Single BeamAngleConfidence { get; };
+        AudioBeamMode AudioBeamMode { get; };
+        Windows.Foundation.Collections.IVectorView<AudioBodyCorrelation> AudioBodyCorrelations { get; };
+        UInt8[] CopyFrameDataToArray();
+        void CopyFrameDataToBuffer(Windows.Storage.Streams.IBuffer buffer);
+        Windows.Storage.Streams.IBuffer LockAudioBuffer();
+        Windows.Foundation.TimeSpan RelativeTime { get; };
+    };
+
+    [interface_name("IAudioBeamFrame", 6A39409E-E295-4B1D-ADDB-F0A71C39B4C9)]
+    runtimeclass AudioBeamFrame
+    {
+        AudioSource AudioSource { get; };
+        Windows.Foundation.TimeSpan Duration { get; };
+        AudioBeam AudioBeam { get; };
+        Windows.Foundation.Collections.IVectorView<AudioBeamSubFrame> SubFrames { get; };
+        Windows.Foundation.TimeSpan RelativeTimeStart { get; };
+    };
+
+    [interface_name("IAudioBeamFrameReader", F87D3A4F-34CE-4661-9115-B05EF2538D3A)]
+    runtimeclass AudioBeamFrameReader
+    {
+        event Windows.Foundation.TypedEventHandler<AudioBeamFrameReader, AudioBeamFrameArrivedEventArgs> FrameArrived;
+        Windows.Foundation.Collections.IVectorView<AudioBeamFrame> AcquireLatestBeamFrames();
+        Boolean IsPaused { get; set; };
+        AudioSource AudioSource { get; };
+    };
+
+    [interface_name("IAudioSource", 55EC5BCB-6048-484B-BA9A-4CD3F54280A3)]
+    runtimeclass AudioSource
+    {
+        event Windows.Foundation.TypedEventHandler<AudioSource, FrameCapturedEventArgs> FrameCaptured;
+        KinectSensor KinectSensor { get; };
+        Boolean IsActive { get; };
+        UInt32 SubFrameLengthInBytes { get; };
+        Windows.Foundation.TimeSpan SubFrameDuration { get; };
+        UInt32 MaxSubFrameCount { get; };
+        AudioBeamFrameReader OpenReader();
+        Windows.Foundation.Collections.IVectorView<AudioBeam> AudioBeams { get; };
+        [interface_name("IAudioSource2", 08BD43A3-7E84-4C3F-A804-9D98992ABC25)]
+        {
+            KinectAudioCalibrationState AudioCalibrationState { get; };
+        }
+    };
+
+    [interface_name("IMultiSourceFrame", B2A7A379-8A4F-4644-910E-72F0130E218F)]
+    runtimeclass MultiSourceFrame
+    {
+        ColorFrameReference ColorFrameReference { get; };
+        DepthFrameReference DepthFrameReference { get; };
+        BodyFrameReference BodyFrameReference { get; };
+        BodyIndexFrameReference BodyIndexFrameReference { get; };
+        InfraredFrameReference InfraredFrameReference { get; };
+        LongExposureInfraredFrameReference LongExposureInfraredFrameReference { get; };
+    };
+
+    [interface_name("IMultiSourceFrameReader", 340A447A-B8CD-4A00-B32B-6E3845DBCF68)]
+    runtimeclass MultiSourceFrameReader
+    {
+        event Windows.Foundation.TypedEventHandler<MultiSourceFrameReader, MultiSourceFrameArrivedEventArgs> MultiSourceFrameArrived;
+        MultiSourceFrame AcquireLatestFrame();
+        FrameSourceTypes FrameSourceTypes { get; };
+        Boolean IsPaused { get; set; };
+        KinectSensor KinectSensor { get; };
+    };
+
+    [interface_name("ICoordinateMapper", C8BAD093-C6BD-4708-9949-A0D7188DD2B2)]
+    runtimeclass CoordinateMapper
+    {
+        event Windows.Foundation.TypedEventHandler<CoordinateMapper, CoordinateMappingChangedEventArgs> CoordinateMappingChanged;
+        DepthSpacePoint MapCameraPointToDepthSpace(CameraSpacePoint cameraPoint);
+        ColorSpacePoint MapCameraPointToColorSpace(CameraSpacePoint cameraPoint);
+        CameraSpacePoint MapDepthPointToCameraSpace(DepthSpacePoint depthPoint, UInt16 depth);
+        ColorSpacePoint MapDepthPointToColorSpace(DepthSpacePoint depthPoint, UInt16 depth);
+        DepthSpacePoint[] MapCameraPointsToDepthSpace(CameraSpacePoint[] cameraPoints);
+        ColorSpacePoint[] MapCameraPointsToColorSpace(CameraSpacePoint[] cameraPoints);
+        CameraSpacePoint[] MapDepthPointsToCameraSpace(DepthSpacePoint[] depthPoints, UInt16[] depths);
+        ColorSpacePoint[] MapDepthPointsToColorSpace(DepthSpacePoint[] depthPoints, UInt16[] depths);
+        CameraSpacePoint[] MapDepthFrameToCameraSpace(UInt16[] depthFrameData);
+        ColorSpacePoint[] MapDepthFrameToColorSpace(UInt16[] depthFrameData);
+        CameraSpacePoint[] MapDepthFrameToCameraSpaceUsingIBuffer(Windows.Storage.Streams.IBuffer depthFrameData);
+        ColorSpacePoint[] MapDepthFrameToColorSpaceUsingIBuffer(Windows.Storage.Streams.IBuffer depthFrameData);
+        DepthSpacePoint[] MapColorFrameToDepthSpace(UInt16[] depthFrameData);
+        CameraSpacePoint[] MapColorFrameToCameraSpace(UInt16[] depthFrameData);
+        DepthSpacePoint[] MapColorFrameToDepthSpaceUsingIBuffer(Windows.Storage.Streams.IBuffer depthFrameData);
+        CameraSpacePoint[] MapColorFrameToCameraSpaceUsingIBuffer(Windows.Storage.Streams.IBuffer depthFrameData);
+        Windows.Foundation.Point[] GetDepthFrameToCameraSpaceTable();
+        [interface_name("ICoordinateMapper2", 5A4DDD5C-3DE3-44EB-B1DC-80673A38C696)]
+        {
+            CameraIntrinsics GetDepthCameraIntrinsics();
+        }
+    };
+
+    [interface_name("IKinectSensor", E3FADC66-723F-48A5-933E-BFD72529AB16)]
+    [static_name("IKinectSensorStatics", C421D46B-5084-45D6-BDF0-57151F81D0D9)]
+    runtimeclass KinectSensor
+    {
+        static KinectSensor GetDefault();
+        static Windows.Foundation.Collections.IObservableMap<String, KinectSensor> Sensors { get; };
+        event Windows.Foundation.TypedEventHandler<KinectSensor, IsAvailableChangedEventArgs> IsAvailableChanged;
+        void Open();
+        void Close();
+        Boolean IsOpen { get; };
+        Boolean IsAvailable { get; };
+        ColorFrameSource ColorFrameSource { get; };
+        DepthFrameSource DepthFrameSource { get; };
+        BodyFrameSource BodyFrameSource { get; };
+        BodyIndexFrameSource BodyIndexFrameSource { get; };
+        InfraredFrameSource InfraredFrameSource { get; };
+        LongExposureInfraredFrameSource LongExposureInfraredFrameSource { get; };
+        AudioSource AudioSource { get; };
+        MultiSourceFrameReader OpenMultiSourceFrameReader(FrameSourceTypes enabledFrameSourceTypes);
+        CoordinateMapper CoordinateMapper { get; };
+        String UniqueKinectId { get; };
+        KinectCapabilities KinectCapabilities { get; };
+    };
+}

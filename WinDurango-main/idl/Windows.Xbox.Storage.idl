@@ -1,0 +1,101 @@
+import "Windows.Xbox.System.idl";
+
+namespace Windows.Xbox.Storage 
+{
+    struct BlobInfo
+    {
+        String Name;
+        UInt32 Size;
+    };
+
+    struct ContainerInfo
+    {
+        String Name;
+        UInt32 TotalSize;
+    };
+
+    struct ContainerInfo2
+    {
+        String Name;
+        UInt64 TotalSize;
+        String DisplayName;
+        Windows.Foundation.DateTime LastModifiedTime;
+        Boolean NeedsSync;
+    };
+
+    [interface_name("IBlobInfoQueryResult", 5598379c-82de-4952-aa30-49ae329c5885)]
+    runtimeclass BlobInfoQueryResult
+    {
+        Windows.Foundation.IAsyncOperation<Windows.Foundation.Collections.IVectorView<BlobInfo> > GetBlobInfoAsync(UInt32 unk, UInt32 unka);
+        [default_overload] Windows.Foundation.IAsyncOperation<Windows.Foundation.Collections.IVectorView<BlobInfo> > GetBlobInfoAsync();
+        Windows.Foundation.IAsyncOperation<UInt32> GetItemCountAsync();
+    }
+
+    [interface_name("IContainerInfoQueryResult", 4f937563-bae3-4062-a67f-cbea61a2edc3)]
+    runtimeclass ContainerInfoQueryResult
+    {
+        Windows.Foundation.IAsyncOperation<Windows.Foundation.Collections.IVectorView<ContainerInfo> > GetContainerInfoAsync(UInt32 unk, UInt32 unka);
+        Windows.Foundation.IAsyncOperation<Windows.Foundation.Collections.IVectorView<ContainerInfo> > GetContainerInfoAsync();
+        Windows.Foundation.IAsyncOperation<UInt32> GetItemCountAsync();
+
+	    [interface_name("IContainerInfo2QueryResult", f8a8cdfe-1d10-42a5-b01e-41718e183ca9)]
+    	{
+        	Windows.Foundation.IAsyncOperation<Windows.Foundation.Collections.IVectorView<ContainerInfo2> > GetContainerInfo2Async(UInt32 unk, UInt32 unka);
+        	Windows.Foundation.IAsyncOperation<Windows.Foundation.Collections.IVectorView<ContainerInfo2> > GetContainerInfo2Async();
+    	}
+    }
+
+    runtimeclass ConnectedStorageContainer
+    {
+        [interface_name("IConnectedStorageContainer", 885c65fe-e884-4cff-ba58-fb82cc32b552)]
+        {
+            String Name { get; };
+            ConnectedStorageSpace OwningSpace { get; };
+            Windows.Foundation.IAsyncAction SubmitUpdatesAsync(Windows.Foundation.Collections.IMapView<String, Windows.Storage.Streams.IBuffer> unk, Windows.Foundation.Collections.IIterable<String> unka);
+            Windows.Foundation.IAsyncAction ReadAsync(Windows.Foundation.Collections.IMapView<String, Windows.Storage.Streams.IBuffer> unk);
+            Windows.Foundation.IAsyncOperation<Windows.Foundation.Collections.IMapView<String, Windows.Storage.Streams.IBuffer> > GetAsync(Windows.Foundation.Collections.IIterable<String> unk);
+            Windows.Foundation.IAsyncAction SubmitPropertySetUpdatesAsync(Windows.Foundation.Collections.IPropertySet unk, Windows.Foundation.Collections.IIterable<String> unka);
+        }
+
+        [interface_name("IConnectedStorageContainer2", af964b72-ec65-46de-935c-845ad0194f0d)]
+        {
+            Windows.Foundation.IAsyncAction SubmitUpdatesAsync(Windows.Foundation.Collections.IMapView<String, Windows.Storage.Streams.IBuffer> unk, Windows.Foundation.Collections.IIterable<String> unka, String unkaa);
+            Windows.Foundation.IAsyncAction SubmitPropertySetUpdatesAsync(Windows.Foundation.Collections.IPropertySet unk, Windows.Foundation.Collections.IIterable<String> unka, String unkaa);
+            BlobInfoQueryResult CreateBlobInfoQuery(String unk);
+        }
+    }
+    
+    runtimeclass ConnectedStorageSpace
+    {
+        [static_name("IConnectedStorageSpaceStatics", 07020414-b3e9-47c8-a36f-f24e2dc65573)]
+        {
+            static Windows.Foundation.IAsyncOperation<ConnectedStorageSpace> GetForUserAsync(Windows.Xbox.System.User unk);
+            [default_overload] static Windows.Foundation.IAsyncOperation<ConnectedStorageSpace> GetForUserAsync(Windows.Xbox.System.User unk, String unka);
+            static Windows.Foundation.IAsyncOperation<ConnectedStorageSpace> GetForMachineAsync();
+            [default_overload] static Windows.Foundation.IAsyncOperation<ConnectedStorageSpace> GetForMachineAsync(String unk);
+        }
+
+        [static_name("IConnectedStorageSpaceStatics2", df3fe390-13fa-4814-91c1-fb92f90f641d)]
+        {
+            static Windows.Foundation.IAsyncOperation<ConnectedStorageSpace> GetSyncOnDemandForUserAsync(Windows.Xbox.System.User unk);
+            [default_overload] static Windows.Foundation.IAsyncOperation<ConnectedStorageSpace> GetSyncOnDemandForUserAsync(Windows.Xbox.System.User unk, String unka);
+        }
+        
+        [default]
+        [interface_name("IConnectedStorageSpace", b48eea29-8323-41bc-bbad-2c26e27bda22)]
+        {
+            Windows.Xbox.System.User User { get; };
+            String ServiceConfigurationId { get; };
+            Boolean IsReadOnly { get; };
+            ConnectedStorageContainer CreateContainer(String unk);
+            Windows.Foundation.IAsyncAction DeleteContainerAsync(String unk);
+            ContainerInfoQueryResult CreateContainerInfoQuery(String unk);
+            Windows.Foundation.IAsyncOperation<Int32> GetRemainingBytesInQuotaAsync();
+        }
+
+        [interface_name("IConnectedStorageSpace2", bc5b91a7-2afc-46fd-81d4-74b8188d748a)]
+        {
+            Windows.Foundation.IAsyncOperation<Int64> GetRemainingBytesInQuota64Async();
+        }
+    }
+}

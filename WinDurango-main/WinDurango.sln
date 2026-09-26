@@ -1,0 +1,21 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WinDurango.CMake", "tools\WinDurango.CMake.vcxproj", "{B7B3A0C4-4C2C-4E57-9F9D-5A9F7B8A2A61}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B7B3A0C4-4C2C-4E57-9F9D-5A9F7B8A2A61}.Debug|x64.ActiveCfg = Debug|x64
+		{B7B3A0C4-4C2C-4E57-9F9D-5A9F7B8A2A61}.Debug|x64.Build.0 = Debug|x64
+		{B7B3A0C4-4C2C-4E57-9F9D-5A9F7B8A2A61}.Release|x64.ActiveCfg = Release|x64
+		{B7B3A0C4-4C2C-4E57-9F9D-5A9F7B8A2A61}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

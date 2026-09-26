@@ -1,0 +1,558 @@
+import "Windows.Xbox.System.idl";
+
+namespace Windows.Xbox.ApplicationModel
+{
+    [flags]
+    enum PrivilegeCheckResult 
+    {
+        NoIssue = 0x0,
+        PurchaseRequired = 0x1,
+        Aborted = 0x2,
+        Banned = 0x4,
+        Restricted = 0x8,
+    };
+
+    namespace Core
+    {
+        [static_name("ICoreApplicationContext", D8D4C59F-B9AC-4D41-842D-A01C59B617E7)]
+        runtimeclass CoreApplicationContext
+        {
+            static Windows.Xbox.System.User CurrentUser { get; };
+            static event Windows.Foundation.EventHandler<IInspectable> CurrentUserChanged;
+
+            [static_name("ICoreApplicationContext2", E555452E-8E16-46A6-BF31-34189B6CAD40)]
+            {
+                static void SetCurrentUser(Windows.Xbox.System.User value);
+            }
+
+            [static_name("ICoreApplicationContext3", 52DB8037-0ECB-48F6-974D-5796ECF34B69)]
+            {
+                static Windows.Xbox.System.User CurrentSystemUser { get; };
+                static event Windows.Foundation.EventHandler<Object> CurrentSystemUserChanged;
+            }
+        }
+
+        [interface_name("IUserContextLookup", 3E696DFE-2D61-42CC-9B58-C23301606C58)]
+        runtimeclass UserContextLookup
+        {
+            void RefreshUserContext(String aumid);
+            Windows.Xbox.System.User GetCurrentUserContext(String aumid);
+            void NotifyUserContextChanged(UInt32 userId, UInt32 userSequenceId);
+        }
+    }
+
+    [static_name("IHelpStatics", 3691495d-4bea-4c05-8791-7f51a9b2bf6b)]
+    runtimeclass Help
+    {
+        static Windows.Foundation.IAsyncAction Show(Windows.Xbox.System.User usr);
+        static Windows.Foundation.IAsyncAction ShowForError(String unk, String unka);
+    }
+
+    namespace Store
+    {
+        [flags]
+        enum ProductItemTypes 
+        {
+            Game = 0x1,
+            App = 0x2,
+            Consumable = 0x4,
+            Durable = 0x8,
+            GameDemo = 0x10,
+        };
+
+        [flags]
+        enum PrivilegeCheckResult 
+        {
+            NoIssue = 0x0,
+            PurchaseRequired = 0x1,
+            Aborted = 0x2,
+            Banned = 0x4,
+            Restricted = 0x8,
+        };
+
+        enum KnownPrivileges 
+        {
+            XPRIVILEGE_BROADCAST = 0xbe,
+            XPRIVILEGE_FREE_CONTENT = 0xc1,
+            XPRIVILEGE_VIEW_FRIENDS_LIST = 0xc5,
+            XPRIVILEGE_GAME_DVR = 0xc6,
+            XPRIVILEGE_SHARE_KINECT_CONTENT = 0xc7,
+            XPRIVILEGE_MULTIPLAYER_PARTIES = 0xcb,
+            XPRIVILEGE_COMMUNICATION_VOICE_INGAME = 0xcd,
+            XPRIVILEGE_COMMUNICATION_VOICE_SKYPE = 0xce,
+            XPRIVILEGE_CLOUD_GAMING_MANAGE_SESSION = 0xcf,
+            XPRIVILEGE_CLOUD_GAMING_JOIN_SESSION = 0xd0,
+            XPRIVILEGE_CLOUD_SAVED_GAMES = 0xd1,
+            XPRIVILEGE_SHARE_CONTENT = 0xd3,
+            XPRIVILEGE_PREMIUM_CONTENT = 0xd6,
+            XPRIVILEGE_NOUPSELL = 0xd7,
+            XPRIVILEGE_SUBSCRIPTION_CONTENT = 0xdb,
+            XPRIVILEGE_SOCIAL_NETWORK_SHARING = 0xdc,
+            XPRIVILEGE_PREMIUM_VIDEO = 0xe0,
+            XPRIVILEGE_VIDEO_COMMUNICATIONS = 0xeb,
+            XPRIVILEGE_PURCHASE_CONTENT = 0xf5,
+            XPRIVILEGE_USER_CREATED_CONTENT = 0xf7,
+            XPRIVILEGE_PROFILE_VIEWING = 0xf9,
+            XPRIVILEGE_COMMUNICATIONS = 0xfc,
+            XPRIVILEGE_MULTIPLAYER_SESSIONS = 0xfe,
+            XPRIVILEGE_ADD_FRIEND = 0xff,
+        };
+
+        [interface_name("IProductPurchasedEventArgs", 22ee37de-7630-4fd8-9e7b-f61f86b5ef7c)]
+        runtimeclass ProductPurchasedEventArgs
+        {
+            String Receipt();
+        }
+
+        [uuid(d1f1adca-92a4-4a88-b205-c54ac6152f43)]
+        delegate HRESULT ProductPurchasedEventHandler(ProductPurchasedEventArgs unk);
+
+        [static_name("IProductStatics", 76efb705-bdd4-4f6a-8d89-a9511d40afe7)]
+        runtimeclass Product
+        {
+            static Windows.Foundation.IAsyncAction ShowPurchaseAsync(Windows.Xbox.System.User unk, String unka);
+            static Windows.Foundation.IAsyncAction ShowDetailsAsync(Windows.Xbox.System.User unk, String unka);
+            static Windows.Foundation.IAsyncAction ShowMarketplaceAsync(Windows.Xbox.System.User unk, ProductItemTypes unka, String unkaa, ProductItemTypes unkaaa);
+            static Windows.Foundation.IAsyncAction ShowRedeemCodeAsync(Windows.Xbox.System.User unk, String unka);
+            static Windows.Foundation.IAsyncAction ShowSubscriptionAsync(Windows.Xbox.System.User unk, String unka, UInt32 unkaa);
+            static Windows.Foundation.IAsyncOperation<PrivilegeCheckResult> CheckPrivilegeAsync(Windows.Xbox.System.User unk, UInt32 unka, Boolean unkaa, String unkaaa);
+            static Windows.Foundation.IAsyncOperation<PrivilegeCheckResult> CheckPrivilegesAsync(Windows.Xbox.System.User unk, Windows.Foundation.Collections.IVectorView<UInt32> unka, Boolean unkaa, String unkaaa);
+            static event ProductPurchasedEventHandler ProductPurchased;
+
+            // TODO
+            [static_name("IProductStaticsV2", 3B082748-9469-4EBD-AE49-AAE86A76F42C)]
+            {
+                static Windows.Foundation.IAsyncAction ShowPurchaseForStoreIdAsync(Windows.Xbox.System.User unk, String unka);
+                static Windows.Foundation.IAsyncAction ShowDetailsForStoreIdAsync(Windows.Xbox.System.User unk, String unka);
+            }
+        }
+
+        [static_name("IConfigurationStatics", 9d50b2e8-eeb6-4ced-b9f1-3eb95b3c1e0f)]
+        runtimeclass Configuration
+        {
+            static String MarketplaceId();
+        }
+    }
+
+    namespace State
+    {
+        namespace Internal
+        {
+            [flags]
+            enum AccessibilityFeature
+            {
+                None = 0,
+                CustomVolumeControls = 1,
+                NarratedGameMenus = 2,
+                SpatialAudio = 4,
+                AccessibilityOnLaunch = 8,
+                AdjustableDifficulty = 16,
+                OnDemandTutorials = 32,
+                Pausable = 64,
+                ProgressSavingOptions = 128,
+                AdjustableInputSensitivity = 256,
+                FullKeyboardSupport = 512,
+                InputRemapping = 1024,
+                NoButtonHolds = 2048,
+                NoQuickTimeEvents = 4096,
+                SingleStickGameplay = 8192,
+                TtsSttCommunications = 16384,
+                AdjustableTextSize = 32768,
+                ColorOptions = 65536,
+                SteadyCamera = 131072,
+                SubtitleOptions = 262144,
+                ContrastOptions = 524288,
+            };
+
+            enum AppListEntry
+            {
+                Default = 0,
+                None = 1
+            };
+
+            enum ConsoleGeneration
+            {
+                Unknown = 0,
+                Era = 1, 
+                GameCoreGen8 = 2,
+                GameCoreGen9 = 3,
+            };
+
+            enum ConsoleType
+            {
+                XboxOne = 0,
+                Xbox360 = 1,
+                XboxOriginal = 2,
+                XboxGen9 = 3,
+                XboxOneGen9Aware = 4,
+            };
+
+            enum EnhancementFeatureState
+            {
+                NotAvailable = 0,
+                Disabled = 1,
+                Enabled = 2,
+            };
+
+            enum FindPackageInfoFilter
+            {
+                All = 0,
+                GamesAndApps = 1,
+                Games = 2,
+                Apps = 3,
+                Dlc = 4,
+            };
+
+            enum GameAttributes
+            {
+                None = 0,
+                XboxOneXEnhanced = 1,
+                XblLocalCoop = 2,
+                XblLocalMultiPlayer = 4,
+                XblOnlineCoop = 8,
+                XblOnlineMultiPlayer = 16,
+                XblGoldRequiredForMultiplayer = 32,
+                Demo = 64,
+                ConsoleGen9Optimized = 128,
+                ConsoleGen8Compatible = 256,
+                ConsoleGen9Compatible = 512,
+                SupportsStreaming = 1024,
+                SupportsInstallFeatures = 2048,
+                XblRequired = 4096,
+                XblGoldRequired = 8192,
+                InAppPurchases = 16384,
+                XblSinglePlayer = 32768,
+                XblCrossPlatformMultiPlayer = 65536,
+                XblCrossPlatformCoop = 131072,
+            };
+
+            enum Genre
+            {
+                None = 0,
+                ActionAndAdventure = 1,
+                CardAndBoard = 4,
+                Classics = 8,
+                Educational = 16,
+                Entertainment = 32,
+                FamilyAndKids = 64,
+                Fighting = 128,
+                MultiPlayerOnlineBattleArena = 256,
+                NewsAndWeather = 512,
+                Music = 1024,
+                Other = 2048,
+                PhotoAndVideo = 4096,
+                Platformer = 8192,
+                Productivity = 16384,
+                PuzzleAndTrivia = 32768,
+                BooksAndReference = 32770,
+                RacingAndFlying = 65536,
+                RolePlaying = 131072,
+                Shooter = 262144,
+                Simulation = 524288,
+                Social = 1048576,
+                Sports = 2097152,
+                Strategy = 4194304,
+                UtilitiesAndTools = 8388608,
+                Video = 16777216,
+                Personalization = 33554432,
+            };
+
+            enum InteractiveElement
+            {
+                None,
+                InGamePurchases,
+                UserInteraction,
+            };
+
+            [flags]
+            enum Language
+            {
+                None = 0,
+                Albanian = 1,
+                Arabic = 2,
+                Bulgarian = 4,
+                Catalan = 8,
+                ChineseSimplified = 16,
+                ChineseTraditional = 32,
+                Croatian = 64,
+                Czech = 128,
+                Danish = 256,
+                Dutch = 512,
+                EnglishUnitedKingdom = 1024,
+                EnglishUnitedStates = 2048,
+                Estonian = 4096,
+                Finnish = 8192,
+                French = 16384,
+                German = 32768,
+                Greek = 65536,
+                Hebrew = 131072,
+                Hungarian = 262144,
+                Italian = 524288,
+                Japanese = 1048576,
+                Korean = 2097152,
+                Latvian = 4194304,
+                Lithuanian = 8388608,
+                Norwegian = 16777216,
+                Polish = 33554432,
+                PortugueseBrazil = 67108864,
+                PortuguesePortugal = 134217728,
+                Romanian = 268435456,
+                Russian = 536870912,
+                Serbian = 1073741824,
+                Slovak = 2147483648,
+            };
+
+            [flags]
+            enum Language2
+            {
+                None = 0,
+                SpanishMexico = 1,
+                SpanishSpain = 2,
+                Swedish = 4,
+                Thai = 8,
+                Turkish = 16,
+                Vietnamese = 32,
+            };
+
+            enum MetadataVersion
+            {
+                v1 = 1,
+                v2 = 2,
+                CurrentVersion = 3,
+                v3 = 3,
+            };
+
+            enum OsEnvironment
+            {
+                Sra = 0,
+                Era = 1,
+                GameCore = 2,
+            };
+
+            enum PackageContentType
+            {
+                Game = 0,
+                App = 1,
+                Dlc = 2,
+                Framework = 3,
+                Other = 255,
+            };
+
+            [flags]
+            enum TechnicalFeature
+            {
+                None = 0,
+                SmartDelivery = 1,
+                FourKResolution = 2,
+                HighDynamicRange = 4,
+                SixtyFramesPerSecond = 8,
+                OneHundredTwentyFramesPerSecond = 16,
+                RayTracing = 32,
+                TouchEnabled = 64,
+                DolbyAtmos = 128,
+                SpatialSound = 256,
+            };
+
+            enum XboxLiveTier
+            {
+                Unknown,
+                Full,
+                Open,
+            };
+
+            struct PerformanceModeDetails
+            {
+                UInt32 FromFps;
+                UInt32 ToFps;
+                Boolean EnabledByDefault;
+            };
+
+            [interface_name("IAppInfo", 518A8D04-41D1-479D-8408-B7AC5F00DA3E)]
+            [static_name("IAppInfoStatics", D52560E0-E3A0-4E21-9895-CFE00678E755)]
+            runtimeclass AppInfo
+            {
+                static AppInfo FindByAumid(String aumid);
+                static Windows.Foundation.Collections.IVectorView<AppInfo> FindByTitleId(UInt32 titleId);
+                PackageInfo Package { get; };
+                String PackageRelativeId { get; };
+                String ShortName { get; };
+                String LongName { get; };
+                String Description { get; };
+                String ForegroundText { get; };
+                UInt32 BackgroundColor { get; };
+                String Logo { get; };
+                String WideLogo { get; };
+                String SmallLogo { get; };
+                String Aumid { get; };
+                String SplashScreen { get; };
+                UInt32 TitleId { get; };
+                Guid PrimaryServiceConfigId { get; };
+                String VuiAlm { get; };
+                String VuiPron { get; };
+                UInt32 RatingCategory { get; };
+                String Ratings { get; };
+                AppListEntry AppListEntry { get; };
+                ConsoleType ConsoleType { get; };
+                XboxLiveTier XboxLiveTier { get; };
+                String InteractiveElements { get; };
+                Boolean RequiresXboxLive { get; };
+                String ExecutableName { get; };
+                Boolean IsXboxOneXEnhanced { get; };
+                Boolean IsDemo { get; };
+                GameAttributes GameAttributes { get; };
+                Genre Genres { get; };
+                String CloudId { get; };
+                InteractiveElement InteractiveElementFlags { get; };
+                TechnicalFeature TechnicalFeatures { get; };
+                AccessibilityFeature AccessibilityFeatures { get; };
+                Language AudioSupportedLanguages { get; };
+                Language2 AudioSupportedLanguages2 { get; };
+                Language InterfaceSupportedLanguages { get; };
+                Language2 InterfaceSupportedLanguages2 { get; };
+                Language SubtitleSupportedLanguages { get; };
+                Language2 SubtitleSupportedLanguages2 { get; };
+            }
+
+            [static_name("IAumidQueryStatics", AF01FEA4-CD80-46DA-930B-D153C7CFF5F2)]
+            runtimeclass AumidQuery
+            {
+                static void GetXboxLiveInfo(String aumid, out UInt32 titleId, out Guid primaryScid, out Boolean requireXboxLive);
+            }
+
+            [interface_name("IContentCompatibility", 4D7D5C92-8950-40A5-9A85-B89719323EC6)]
+            runtimeclass ContentCompatibility
+            {
+                ContentCompatibility();
+                [default_overload] HRESULT IsContentCompatible(Guid contentId);
+                HRESULT IsContentCompatible(String productId);
+                UInt64 GetQuickResumeFlags(UInt32 titleId);
+                Boolean IsQuickResumeAllowedForEra(UInt32 titleId);
+                Boolean IsQuickResumeBlockedForGameCore(UInt32 titleId);
+                HRESULT IsXbox360ContentCompatible(Guid legacyProductId);
+                String GetXbox360StoreIdFromContentId(Guid contentId);
+                Boolean IsQuickResumeBlockedForServer(UInt32 titleId);
+                UInt32 GetMacIdBehaviorForTitleOnServer(UInt32 titleId);
+            }
+
+            [interface_name("IContentEnhancements", 9F101CB0-C1B7-415F-B069-DF12BCB56010)]
+            runtimeclass ContentEnhancements
+            {
+                ContentEnhancements();
+                UInt64 GetEnhancementSettings(UInt32 titleId);
+                EnhancementFeatureState GetAutoHDREnabledGlobally();
+                Boolean GetAutoHDRAllowedForGame(UInt32 titleId);
+                Boolean GetAutoHDREnabledForGame(UInt32 titleId);
+                void SetAutoHDREnabledForGame(UInt32 titleId, Boolean isFeatureEnabled);
+                Boolean GetPerformanceModeAllowedForGame(UInt32 titleId);
+                Boolean GetPerformanceModeEnabledForGame(UInt32 titleId);
+                void SetPerformanceModeEnabledForGame(UInt32 titleId, Boolean isFeatureEnabled);
+                Boolean GetPerformanceModeForGameRequires120Hz(UInt32 titleId);
+                PerformanceModeDetails GetPerformanceModeDetailsForGame(UInt32 titleId);
+                Boolean GetAutoHDRAllowedForGameFromManifest(String aumid);
+                Boolean GetAutoHDREnabledForGameFromManifest(UInt32 titleId);
+                Boolean IsGen9AwareGame(Guid legacyProductId);
+            }
+
+            [interface_name("IDlcInfo", F56DC224-8B10-4638-ABCF-57526C5109C3)]
+            runtimeclass DlcInfo
+            {
+                PackageInfo Package { get; };
+                String ShortName { get; };
+                String LongName { get; };
+                String Description { get; };
+                String ForegroundText { get; };
+                UInt32 BackgroundColor { get; };
+                String Logo { get; };
+                String WideLogo { get; };
+                String SmallLogo { get; };
+                Guid AllowedProductId { get; };
+                Windows.Foundation.Collections.IVectorView<Guid> RelatedMedia { get; };
+                String AllowedPackageFamilyName { get; };
+                Windows.Foundation.Collections.IVectorView<String> RelatedMediaFamilyNames { get; };
+                UInt32 RatingCategory { get; };
+                String Ratings { get; };
+            }
+
+            [interface_name("IPackageChangedEventArgs", ED8C3E04-6F2F-494F-B29C-F04241263318)]
+            runtimeclass PackageChangedEventArgs
+            {
+                String PackageInstanceId { get; };
+            }
+
+            [static_name("IPackageFullNameQueryStatics", D1E139C4-D34A-4703-9671-8AEDE79A48CE)]
+            runtimeclass PackageFullNameQuery
+            {
+                static Boolean IsInbox(String packageFullName);
+                static Boolean IsEra(String packageFullName);
+                static PackageContentType GetContentType(String packageFullName);
+                static Boolean IsGameCore(String packageFullName);
+            }
+
+            [interface_name("IPackageInfoEvents", 6C9844D4-7C13-4BC2-B1DA-2DC84575A22E)]
+            runtimeclass PackageInfoEvents
+            {
+                PackageInfoEvents();
+                event Windows.Foundation.EventHandler<PackageChangedEventArgs> PackageChanged;
+                event Windows.Foundation.EventHandler<Object> PackageReset;
+                void LogStats();
+            }
+
+            [interface_name("IPackageInfo", D7E4EB34-7189-4D56-B869-EE9F8CEB5479)]
+            [static_name("IPackageInfoStatics", C65571F5-A60E-4CB8-9C24-C80266280D08)]
+            runtimeclass PackageInfo
+            {
+                static Windows.Foundation.Collections.IVectorView<PackageInfo> Find(FindPackageInfoFilter filter);
+                static Windows.Foundation.Collections.IVectorView<PackageInfo> FindByDeviceId(Guid deviceId, FindPackageInfoFilter filter);
+                static Windows.Foundation.Collections.IVectorView<PackageInfo> FindByContentId(Guid contentId);
+                static Windows.Foundation.Collections.IVectorView<PackageInfo> FindByProductId(Guid productId);
+                static Windows.Foundation.Collections.IVectorView<PackageInfo> FindByTitleId(UInt32 titleId);
+                static Windows.Foundation.Collections.IVectorView<PackageInfo> FindByAllowedProductId(Guid allowedProductId);
+                static PackageInfo FindByPackageInstanceId(String packageInstanceId);
+                static Windows.Foundation.Collections.IVectorView<PackageInfo> FindUniversalPackagesByFamilyName(String packageFamilyName);
+                static Windows.Foundation.Collections.IVectorView<PackageInfo> FindByAllowedPackageFamilyName(String allowedPackageFamilyName);
+                static Windows.Foundation.Collections.IVectorView<PackageInfo> FindUnparented();
+                static PackageInfo FindByFullName(String fullName);
+                static Windows.Foundation.Collections.IVectorView<PackageInfo> FindByTitleSearchString(String searchString, UInt32 maxResults);
+                static PackageInfo FindGameHub(Guid gameHubId);
+                static Windows.Foundation.Collections.IVectorView<PackageInfo> FindPackagesForGameHub(Guid gameHubId);
+                String PackageInstanceId { get; };
+                PackageContentType ContentType { get; };
+                Boolean IsInbox { get; };
+                UInt64 Version { get; };
+                String FullName { get; };
+                String FamilyName { get; };
+                String PublisherName { get; };
+                Guid ContentId { get; };
+                Guid ProductId { get; };
+                Guid DeviceId { get; };
+                OsEnvironment OsEnvironment { get; };
+                Boolean ImplementsContentRestrictions { get; };
+                UInt64 Size { get; };
+                UInt64 PersistentLocalStorageSize { get; };
+                Boolean IsPreIndexed { get; };
+                Boolean HasContentId { get; };
+                Windows.Foundation.Collections.IVectorView<AppInfo> Apps { get; };
+                DlcInfo Dlc { get; };
+                Windows.Foundation.DateTime InstallDate { get; };
+                Windows.Foundation.DateTime UpdateDate { get; };
+                String OneStoreProductId { get; };
+                Boolean SupportsMultipleUsers { get; };
+                AppInfo FirstVisibleApp { get; };
+                Boolean IsStoreInstalledSystemApp { get; };
+                Boolean IsContainerless { get; };
+                ConsoleGeneration Generation { get; };
+                Guid BuildId { get; };
+                Boolean WasRemoteInstalled { get; };
+                Boolean IsCloudPackage { get; };
+                Guid GameHubId { get; };
+                Boolean IsGameHub { get; };
+            }
+
+            [static_name("IProtocolQueryStatics", 0D12A529-BBF6-4DD2-9C53-72458CD30629)]
+            runtimeclass ProtocolQuery
+            {
+                static Windows.Foundation.Collections.IVectorView<String> FindAumidsForScheme(String scheme);
+            }
+        }
+    }
+}

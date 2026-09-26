@@ -1,0 +1,615 @@
+import "Windows.Xbox.System.idl";
+import "Windows.Xbox.Multiplayer.idl";
+import "Windows.Xbox.Input.idl";
+
+namespace Windows.Xbox.UI 
+{
+    enum AccountPickerInternalOptions
+    {
+        None = 0x0,
+        HideAdults = 0x1,
+        HideChildren = 0x2,
+        HideGuests = 0x4,
+        HideSignedInUsers = 0x8,
+        HideSignedOutUsers = 0x10,
+        HideInputList = 0x20,
+        HideCallingUser = 0x40,
+        HideNewProfile = 0x80,
+        HideAddUserButton = 0x100,
+        HideGuestUserButton = 0x200,
+        HideSignoutAction = 0x400,
+        HideSelectAction = 0x800,
+        HideCallingUserId = 0x1000,
+        HideCloseButton = 0x2000,
+        HideRecogizeAction = 0x4000,
+        HideQuickerPicker = 0x8000,
+        DefaultFlags = 0x20000,
+        PairToController = 0x20000,
+        DefaultFlagsNoGuests = 0x20204,
+        BioCorrection = 0x40000,
+        DefaultFocusOnUser = 0x80000,
+        HomeMode = 0x100000,
+        SelectOnlyMode = 0x200000,
+        InputListModeWLID = 4194304,
+        PickerMode = 0x400000,
+        DeleteMode = 0x1000000,
+        SkipTeachHome = 0x2000000,
+        ChallengeUser = 0x4000000,
+        DevicePairingMode = 0x8000000,
+        HighlightCallingUser = 0x10000000,
+        AllowOnlyDistinctControllerTypes = 0x20000000,
+    };
+
+    enum AccountPickerInternalResultAction
+    {
+        None,
+        AddUser,
+        AlreadySignedIn,
+    };
+
+    enum AccountPickerOptions
+    {
+        None,
+        AllowGuests,
+        AllowOnlyDistinctControllerTypes,
+    };
+
+    enum AddRemoveFriendResultStatus
+    {
+        None,
+        Friend,
+        Favorite,
+    };
+
+    enum BlockAndRemoveMode
+    {
+        Block,
+        RemoveFriend,
+    };
+
+    enum CloudStreamingSystemUIType
+    {
+        ShowVirtualKeyboard,
+        ShowMessageDialog,
+        ShowPurchase,
+        ShowApplication,
+        ShowTimerExtension,
+        CheckPrivileges,
+        BlockGuide,
+        BlockParty,
+        ShowProfileCard,
+        ShowAchievements,
+        ShowAddRemoveFriend,
+        ShowLaunchParty,
+        ShowComposeMessage,
+        ShowPeoplePicker,
+        BlockJoinGame,
+        BlockToasts,
+        ShowFeedback,
+        ShowMicrophoneSettings,
+        ToggleMute,
+        ShowPrivilegeBlocked_AddFriend,
+        ShowPrivilegeBlocked_Multiplayer,
+        ShowSendInvites,
+        ShowStateShare,
+    };
+
+    enum ClubPickerMode
+    {
+        Owner,
+        FeedPost,
+        Invite,
+        Member,
+        Ban,
+    };
+
+    enum FacebookFriendFinderMode
+    {
+        OptIn,
+        OptOut,
+        Repair,
+    };
+
+    enum FeedComposeLaunchType
+    {
+        Default = 0x0,
+        ByTitle = 0x1,
+        Share = 0x2,
+        ForClub = 0x4,
+    };
+
+    enum FirmwareUpdateStatus
+    {
+        Unknown,
+        Succeeded,
+        AlreadyUpToDate,
+        UserCanceled,
+        Failed,
+    };
+
+    enum MessagePartType
+    {
+        TitleItem,
+    };
+
+    enum MiniguideCommand
+    {
+        None,
+        ChannelDown,
+        ChannelUp,
+    };
+
+    enum ModalDestination
+    {
+        Default,
+        Share,
+    };
+
+    enum NotificationPositionHint
+    {
+        BottomCenter,
+        BottomLeft,
+        BottomRight,
+        TopCenter,
+        TopLeft,
+        TopRight,
+    };
+
+    enum PeoplePickerFilterOptions
+    {
+        All = 0x0,
+        Others = 0x1,
+        Friends = 0x2,
+        SentFriendRequests = 0x4,
+    };
+
+    enum PeoplePickerLaunchOptions
+    {
+        None = 0x0,
+        HideClubs = 0x1,
+        HideFindSomeone = 0x2,
+        HideSuggestedFriendsInFindSomeone = 0x4,
+        ShowFilters = 0x8,
+    };
+
+    enum PositioningTcuiMode
+    {
+        BroadcastingCameraOverlayPosition,
+        BroadcastingChatWindowPosition,
+        AchievementTrackerOverlayPosition,
+        PartyOverlayPosition,
+        DefaultNotificationPosition,
+    };
+
+    enum RemotedPurchaseScenarioType
+    {
+        XboxPurchaseApi,
+        OneCoreRequestPurchase,
+        ShowDetails,
+        ShowDetailsForStoreId,
+        ShowMarketplace,
+        XStoreShowPurchaseUI,
+        XStoreShowProductPageUI,
+        XStoreShowAssociatedProductsUI,
+        XStoreShowGiftingUI,
+    };
+
+    enum ReportDefaultReason
+    {
+        None = 0x0,
+        NameOrGamertag = 0x1,
+        Cheating = 0x2,
+        PlayerPicture = 0x3,
+        VoiceCommunication = 0x4,
+        UnsportingBehavior = 0x5,
+        QuitEarly = 0x6,
+        Message = 0x7,
+        ActivityFeedItem = 0x8,
+        ActivityFeedItemComment = 0x9,
+        ProfileUGCText = 0xA,
+        GameClip = 0xB,
+        Screenshot = 0xC,
+        VoiceMessage = 0xD,
+        UserContentInappropriateLFG = 0xE,
+        CommsLFGApplication = 0xF,
+        UserContentInappropriateClub = 0x10,
+        CommsTextMessageBreaksClubRules = 0x11,
+        UserContentInappropriateClubCard = 0x13,
+        Count = 0x16,
+    };
+
+    enum SearchScope
+    {
+        All,
+        Installed,
+        Settings,
+        Store,
+        GamePass,
+        AllEntertainment,
+        Movies,
+        Tv,
+        XboxAssist,
+    };
+
+    enum ShareContentAppSource
+    {
+        External,
+        Guide,
+        Dashboard,
+        Captures,
+    };
+
+    enum ShareContentDestination
+    {
+        None = 0x0,
+        Feed = 0x1,
+        Message = 0x2,
+        Showcase = 0x4,
+        TitleShowcase = 0x10,
+        OneDrive = 0x20,
+        EditorialShowcase = 0x40,
+        Club = 0x80,
+        Mobile = 0x100,
+    };
+
+    enum ShareContentSource
+    {
+        Unknown = 0,
+        FeedItem = 1,
+        Achievement = 2,
+        LocalGameclip = 3,
+        LocalScreenshot = 4,
+        CloudGameclip = 5,
+        CloudScreenshot = 6,
+        Leaderboard = 9,
+    };
+
+    enum MessageDialogOptions
+    {
+        Unknown = 0,
+        // TODO
+    };
+
+    enum PrivilegeCheckResult
+    {
+        Unknown = 0,
+        // TODO
+    };
+
+    enum SpeechToTextPositionHint
+    {
+        BottomCenter,
+        BottomLeft,
+        BottomRight,
+        MiddleRight,
+        MiddleLeft,
+        TopCenter,
+        TopLeft,
+        TopRight,
+    };
+
+    enum SpeechToTextType
+    {
+        Voice,
+        Text,
+    };
+
+    enum VirtualKeyboardInputScope
+    {
+        Default = 0x0,
+        Url = 0x1,
+        EmailSmtpAddress = 0x5,
+        Number = 0x1D,
+        Password = 0x1F,
+        TelephoneNumber = 0x20,
+        Alphanumeric = 0x28,
+        Search = 0x32,
+    };
+
+    [flags]
+    enum WebAuthenticationOptions
+    {
+        None = 0x0,
+        SilentMode = 0x1,
+        UseTitle = 0x2,
+        UseHttpPost = 0x4,
+        UseCorporateNetwork = 0x8,
+    };
+
+    enum WebAuthenticationStatus
+    {
+        Success,
+        UserCancel,
+        ErrorHttp,
+    };
+
+    [interface_name("IAccountPickerResult", 84453B4A-51F3-4651-A517-53C73BB3E1F4)]
+    runtimeclass AccountPickerResult
+    {
+        Windows.Xbox.System.User User { get; };
+    }
+
+    [interface_name("IAddRemoveFriendResult", 7EBDF37A-3478-474A-8405-0B6E9B92D75C)]
+    runtimeclass AddRemoveFriendResult
+    {
+        AddRemoveFriendResultStatus Status { get; };
+    }
+
+    [interface_name("IFirmwareUpdateResult", 18E3FD2E-8CCA-461E-ABE1-B6DAD7F3F987)]
+    runtimeclass FirmwareUpdateResult
+    {
+        FirmwareUpdateStatus Status { get; };
+        UInt64 ControllerIdUpdated { get; };
+    }
+
+    [interface_name("IKeyboardOptions", 74782F58-DA5D-4E31-9E6E-BD10C91F1BE7)]
+    runtimeclass KeyboardOptions
+    {
+        KeyboardOptions();
+        String DefaultText { get; set; };
+        String TitleText { get; set; };
+        String DescriptionText { get; set; };
+        UInt32 MaxLength { get; set; };
+        Boolean LengthIndicatorVisibility { get; set; };
+        UInt32 LengthIndicatorThreshold { get; set; };
+        VirtualKeyboardInputScope InputScope { get; set; };
+    }
+
+    [interface_name("INetworkTroubleshooterResult", E98F1CA2-D258-4C14-B6AE-A7CB8A50E7A4)]
+    runtimeclass NetworkTroubleshooterResult
+    {
+        Boolean ConnectedToLive { get; };
+        Windows.Foundation.Collections.IPropertySet AllResults { get; };
+    }
+
+    [interface_name("IShareContentResult", BB92C755-1665-43AD-9464-67D282705DA5)]
+    runtimeclass ShareContentResult
+    {
+        ShareContentDestination Destination { get; };
+    }
+
+    [interface_name("ISignUpResult", D37F0A11-6306-4EC6-912B-838AAC24DB92)]
+    runtimeclass SignUpResult
+    {
+        Windows.Xbox.System.User User { get; };
+        Windows.Foundation.Collections.IPropertySet Properties { get; };
+        Windows.Xbox.System.User SystemUser { get; };
+    }
+
+    [interface_name("IWebAuthenticationResult", A622C922-20EF-41C8-A17C-99DFF77585E7)]
+    runtimeclass WebAuthenticationResult
+    {
+        String ResponseData { get; };
+        WebAuthenticationStatus ResponseStatus { get; };
+        UInt32 ResponseErrorDetail { get; };
+    }
+
+    [static_name("IAccessibilityStatics", CDD39231-5337-48FA-8099-7EDD5AFA5319)]
+    runtimeclass Accessibility
+    {
+        static void SetSpeechToTextPositionHint(SpeechToTextPositionHint position);
+        static void SendSpeechToTextString(String speakerName, String content, SpeechToTextType type);
+        [static_name("IPackageTransferWatcherTransferInfo", 394F1212-30D9-489E-994F-9B7AC693B21E)]
+        {
+            static UInt32 BeginSpeechToTextHypothesisString(String speakerName, String content, SpeechToTextType type);
+            static void UpdateSpeechToTextHypothesisString(UInt32 hypthesisId, String content);
+            static void FinalizeSpeechToTextHypothesisString(UInt32 hypthesisId, String content);
+            static void CancelSpeechToTextHypothesisString(UInt32 hypthesisId);
+            static void ClearSpeechToTextStrings();
+            static void SendSpeechToTextStringWithColor(String speakerName, String content, SpeechToTextType type, Windows.UI.Color speakerColor);
+        }
+    }
+
+    [static_name("ICloudStreamingSystemUIStatics", D8348323-1B4D-452A-83BA-89307E339D7E)]
+    runtimeclass CloudStreamingSystemUI
+    {
+        static Boolean ShouldRemoteSystemUI(CloudStreamingSystemUIType type);
+        static Windows.Foundation.IAsyncOperation<String> RemoteShowVirtualKeyboardAsync(
+            String titleText,
+            String descriptionText,
+            String defaultText,
+            VirtualKeyboardInputScope inputScope,
+            UInt32 maxLength,
+            Boolean lengthIndicatorVisibility,
+            UInt32 lengthIndicatorThreshold
+        );
+        static Windows.Foundation.IAsyncOperation<UInt32> RemoteShowMessageDialogAsync(
+            String titleText,
+            String contentText,
+            MessageDialogOptions options,
+            String commandLabel1,
+            String commandLabel2,
+            String commandLabel3,
+            UInt32 defaultIndex,
+            UInt32 cancelIndex
+        );
+        static Windows.Foundation.IAsyncOperation<String> RemoteShowPurchaseAsync(
+            String xuid,
+            String productId,
+            String desiredItemTypes,
+            String name,
+            String extendedJsonData,
+            String cv,
+            RemotedPurchaseScenarioType scenario
+        );
+        static Windows.Foundation.IAsyncAction RemoteShowApplicationAsync(String uri);
+        static Windows.Foundation.IAsyncOperation<Boolean> RemoteShowTimerExtensionAsync(
+            String appId,
+            UInt32 minutesLeft,
+            Boolean isAppBlocked
+        );
+        static void SetCloudStreamingServiceForTest(Object cloudStreamingService);
+        static Windows.Foundation.IAsyncOperation<PrivilegeCheckResult> RemoteCheckPrivilegesAsync(
+            Windows.Xbox.System.User user,
+            Windows.Foundation.Collections.IVectorView<UInt32> privilegeIds,
+            Boolean attemptResolution,
+            String friendlyDisplay
+        );
+        static Windows.Foundation.IAsyncAction RemoteShowProfileCardAsync(Windows.Xbox.System.User requestingUser, String targetXuid);
+        static Windows.Foundation.IAsyncAction RemoteLaunchAchievementsAsync(Windows.Xbox.System.User requestingUser, UInt32 titleId);
+        static Windows.Foundation.IAsyncOperation<AddRemoveFriendResult> RemoteAddRemoveFriendAsync(
+            Windows.Xbox.System.User requestingUser,
+            String targetUserId
+        );
+        static Windows.Foundation.IAsyncAction RemoteLaunchPartyAsync(Windows.Xbox.System.User requestingUser, Windows.Foundation.Collections.IVectorView<String> inviteUserIdList);
+        static Windows.Foundation.IAsyncAction RemoteShowComposeMessageAsync(
+            Windows.Xbox.System.User requestingUser,
+            String defaultMessageText,
+            Windows.Foundation.Collections.IVector<String> recipientUserIdList
+        );
+        static Windows.Foundation.IAsyncOperation<Windows.Foundation.Collections.IVectorView<String> > RemotePeoplePickerAsync(
+            Windows.Xbox.System.User requestingUser,
+            String promptText,
+            Windows.Foundation.Collections.IVectorView<String> selectFromXuidList,
+            Windows.Foundation.Collections.IVectorView<String> preselectedXuidList,
+            UInt32 minimumSelectionCount,
+            UInt32 maximumSelectionCount
+        );
+        static Boolean ShouldRemoteAllProtocolActivations();
+        static Boolean ShouldBlockMultipleTCUIClientTransactions();
+        static Windows.Foundation.IAsyncAction RemoteShowFeedbackAsync();
+        static Windows.Foundation.IAsyncAction RemoteShowMicrophoneSettingsAsync();
+        static Windows.Foundation.IAsyncAction RemoteToggleMuteAsync();
+        static Windows.Foundation.IAsyncOperation<Boolean> RemoteShowPrivilegeBlockedAsync(
+            Windows.Xbox.System.User user,
+            UInt32 privilegeId,
+            UInt32 titleId,
+            Windows.Foundation.Collections.IPropertySet customOptions
+        );
+        static Windows.Foundation.IAsyncAction RemoteShowGameTimeAsync(
+            String aumid,
+            UInt32 notificationType,
+            UInt32 secondsLeft,
+            Boolean canRequestMoreTime,
+            Boolean suppressNotification
+        );
+        static Windows.Foundation.IAsyncAction RemoteShowSendInvitesAsync(Windows.Xbox.System.User requestingUser);
+        static Windows.Foundation.IAsyncAction RemoteShowSendGameInvitesAsync(
+            Windows.Xbox.System.User requestingUser,
+            Windows.Xbox.Multiplayer.MultiplayerSessionReference sessionReferenceToInviteTo,
+            String inviteDisplayTextId,
+            String customActivationContext
+        );
+        static Windows.Foundation.IAsyncAction RemoteShowSendMultiplayerActivityInvitesAsync(Windows.Xbox.System.User requestingUser, UInt32 titleId);
+        static Windows.Foundation.IAsyncAction RemoteShowStateShareAsync(Windows.Xbox.System.User requestingUser, UInt32 xblTitleId, String linkToken);
+    }
+
+    runtimeclass SystemUI
+    {
+        [static_name("ISystemUIStatics", 1A0DD80E-3F9D-4CFA-8E50-0E2EBD1AA72F)]
+        {
+        static Windows.Foundation.IAsyncAction ShowEpgAsync(
+            Windows.Xbox.System.User requestingUser,
+            Windows.Foundation.Collections.IIterable<Windows.Foundation.Collections.IKeyValuePair<String, Object> > propertySet
+        );
+        static Windows.Foundation.IAsyncAction ShowMiniguideAsync(Windows.Xbox.System.User requestingUser);
+        static Windows.Foundation.IAsyncAction ShowProfileCardAsync(Windows.Xbox.System.User requestingUser, String targetXuid);
+        static Windows.Foundation.IAsyncAction ShowSendInvitesAsync(Windows.Xbox.System.User requestingUser);
+        static Windows.Foundation.IAsyncOperation<AccountPickerResult> ShowAccountPickerAsync(
+            Windows.Xbox.Input.Controller controller,
+            AccountPickerOptions options
+        );
+        static Windows.Foundation.IAsyncOperation<String> ShowVirtualKeyboardAsync(
+            String defaultText,
+            String titleText,
+            String descriptionText,
+            VirtualKeyboardInputScope inputScope
+        );
+        static Windows.Foundation.IAsyncAction LaunchPartyAsync(Windows.Xbox.System.User requestingUser);
+        static Windows.Foundation.IAsyncAction LaunchAchievementsAsync(Windows.Xbox.System.User requestingUser, UInt32 titleId);
+        }
+        [static_name("ISystemUIStatics2", FA2BDF0C-3698-4BF2-A101-276A5B390341)]
+        {
+            static Windows.Foundation.IAsyncAction LaunchKinectSetupAsync(Windows.Xbox.System.User requestingUser);
+            static Windows.Foundation.IAsyncAction LaunchRecentPlayersAsync(Windows.Xbox.System.User requestingUser);
+        }
+        [static_name("ISystemUIStatics3", 14C3EB45-096B-4188-9CF6-985A35B81502)]
+        {
+            static Windows.Foundation.IAsyncAction SnapDefaultBroadcastApp(Windows.Xbox.System.User requestingUser);
+        }
+        [static_name("ISystemUIStatics4", 641D0270-D6D0-48FF-BB20-D08B4212CA28)]
+        {
+            static Windows.Foundation.IAsyncAction ShowComposeMessageAsync(
+                Windows.Xbox.System.User requestingUser,
+                String defaultMessageText,
+                Windows.Foundation.Collections.IVector<String> recipientUserIdList
+            );
+            static Windows.Foundation.IAsyncOperation<AddRemoveFriendResult> ShowAddRemoveFriendAsync(
+                Windows.Xbox.System.User requestingUser,
+                String targetUserId
+            );
+        }
+        [static_name("ISystemUIStatics5", 1FAC25F1-2FA6-4A68-88D6-89D5454A6C0F)]
+        {
+            static Windows.Foundation.IAsyncOperation<Windows.Foundation.Collections.IVectorView<String> > ShowPeoplePickerAsync(
+                Windows.Xbox.System.User requestingUser,
+                String promptText,
+                Windows.Foundation.Collections.IVectorView<String> selectFromUserIdList,
+                Windows.Foundation.Collections.IVectorView<String> preselectedUserIdList,
+                UInt32 minimumSelectionCount,
+                UInt32 maximumSelectionCount
+            );
+            static Windows.Foundation.IAsyncOperation<Boolean> TrySnapSelf();
+            static Windows.Foundation.IAsyncOperation<Boolean> TrySnapOther(Windows.Foundation.Uri snapTargetUri, Windows.Xbox.System.User user);
+        }
+        [static_name("ISystemUIStatics6", E5B15E1D-AAA3-4FAB-94AF-1C9C75AD4F6A)]
+        {
+            static Windows.Foundation.IAsyncAction ShowMiniguideWithCommandAsync(Windows.Xbox.System.User requestingUser, MiniguideCommand initialCommand);
+        }
+        [static_name("ISystemUIStatics7", 01F75706-9DF0-44D8-837C-A930DA05A74A)]
+        {
+            static Windows.Foundation.IAsyncOperation<String> ShowVirtualKeyboardWithOptionsAsync(KeyboardOptions options);
+            static Windows.Foundation.IAsyncAction ShowSendGameInvitesAsync(
+                Windows.Xbox.System.User requestingUser,
+                Windows.Xbox.Multiplayer.MultiplayerSessionReference sessionReferenceToInviteTo,
+                String customActivationContext
+            );
+            static Windows.Foundation.IAsyncAction ShowSendGameInvitesWithDisplayTextAsync(
+                Windows.Xbox.System.User requestingUser,
+                Windows.Xbox.Multiplayer.MultiplayerSessionReference sessionReferenceToInviteTo,
+                String inviteDisplayTextId,
+                String customActivationContext
+            );
+        }
+        [static_name("ISystemUIStatics8", 197625D0-AF45-4F9C-B068-D5BDA0E60958)]
+        {
+            static void SetNotificationPositionHint(NotificationPositionHint value);
+        }
+        [static_name("ISystemUIStatics9", 94C1EE95-9D28-4383-896E-86060FD07677)]
+        {
+            static Windows.Foundation.IAsyncOperation<WebAuthenticationResult> AuthenticateWithCallbackUriAsync(
+                Windows.Xbox.System.User requestingUser,
+                WebAuthenticationOptions options,
+                Windows.Foundation.Uri requestUri,
+                Windows.Foundation.Uri callbackUri);
+            static Windows.Foundation.IAsyncOperation<WebAuthenticationResult> AuthenticateWithoutCallbackUriAsync(
+                Windows.Xbox.System.User requestingUser,
+                WebAuthenticationOptions options,
+                Windows.Foundation.Uri requestUri);
+            static Windows.Foundation.Uri GetCurrentApplicationCallbackUri(Windows.Xbox.System.User requestingUser);
+        }
+        [static_name("ISystemUIStatics10", 09D7DC41-D53B-496D-85B8-E7A6FE594757)]
+        {
+            static Windows.Foundation.IAsyncAction ShowPartyAndSendPartyInvitesAsync(Windows.Xbox.System.User requestingUser, Windows.Foundation.Collections.IVectorView<String> recipientUserIdList);
+        }
+        [static_name("ISystemUIStatics11", E82C7850-07A5-4682-B7AD-F234CBD39A09)]
+        {
+            static Windows.Foundation.IAsyncAction ShowCreateLookingForGroupAsync(
+                Windows.Xbox.System.User requestingUser,
+                Windows.Foundation.Collections.IVectorView<String> preselectedTags,
+                String preselectedDescription,
+                UInt32 defaultNeedCount);
+            static Windows.Foundation.IAsyncAction ShowUserLookingForGroupsAsync(Windows.Xbox.System.User requestingUser);
+            static Windows.Foundation.IAsyncAction ShowLookingForGroupResultsAsync(Windows.Xbox.System.User requestingUser, Windows.Foundation.Collections.IVectorView<String> tags);
+        }
+        [static_name("ISystemUIStatics12", C20C73CB-3C60-4949-80C1-120579E4CD06)]
+        {
+            static Windows.Foundation.IAsyncAction ShowSendMultiplayerActivityGameInvites(Windows.Xbox.System.User requestingUser, UInt32 titleId);
+        }
+        [static_name("ISystemUIStatics13", D7BB05F1-B5EE-46BF-B82A-9B93E73F2B7F)]
+        {
+            static Windows.Foundation.IAsyncAction ShowStateShareAsync(Windows.Xbox.System.User requestingUser, UInt32 xblTitleId, String linkToken);
+        }
+    }
+
+}
