@@ -55,6 +55,30 @@ jobs:
       shell: pwsh
       run: ./WinDurango-main/tests/validate_project.ps1
 
+    - name: Diagnose test layout
+      shell: pwsh
+      run: |
+          Get-ChildItem -Recurse build/bin/Release/apis, build/bin/Release/apps |
+              Select-Object FullName, Length | Format-Table -AutoSize -Wrap
+
+    - name: Probe load-apis bounded
+      shell: pwsh
+      run: |
+          $proc = Start-Process -FilePath "$PWD/build/bin/Release/WinDurangoHost.exe" `
+              -ArgumentList "--load-apis" -WorkingDirectory "$PWD/build/bin/Release" `
+              -NoNewWindow -PassThru `
+              -RedirectStandardOutput "$PWD/load-apis.log" -RedirectStandardError "$PWD/load-apis.err"
+          if (-not $proc.WaitForExit(60000)) {
+              Write-Output "HANG: --load-apis did not exit in 60s, killing"
+              Stop-Process -Id $proc.Id -Force
+          } else {
+              Write-Output "exited with code $($proc.ExitCode)"
+          }
+          Write-Output "--- stdout ---"
+          Get-Content "$PWD/load-apis.log" -ErrorAction SilentlyContinue
+          Write-Output "--- stderr ---"
+          Get-Content "$PWD/load-apis.err" -ErrorAction SilentlyContinue
+
     - name: Run contract tests
       run: ctest --test-dir build -C Release --output-on-failure --timeout 120
 
