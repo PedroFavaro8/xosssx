@@ -1,0 +1,66 @@
+name: Build WD
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: windows-2025-vs2026
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Cache Windows SDK
+      id: cache-winsdk
+      uses: actions/cache@v5
+      with:
+        path: C:\Program Files (x86)\Windows Kits\10
+        key: windows-sdk-28000
+    
+    - uses: ChristopheLav/windows-sdk-install@v1
+      if: steps.cache-winsdk.outputs.cache-hit != 'true'
+      with:
+        version-sdk: 28000
+        features: 'OptionId.UWPCPP,OptionId.DesktopCPParm64'
+
+    - uses: ilammy/msvc-dev-cmd@v1
+      with: 
+        sdk: 10.0.28000.0
+
+    - name: Install VCPkg Packages
+      uses: lukka/run-vcpkg@v11
+
+    - name: Cache Cmake
+      uses: actions/cache@v5
+      with: 
+        path: build
+        key: cmake-${{ hashFiles('**/CMakeLists.txt') }}
+        restore-keys: cmake-
+    
+    - name: Configure CMake
+      run: |
+          New-Item -ItemType Directory -Force -Path build
+          cd build
+          cmake .. -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake
+          cd ../
+
+    - name: Build WinDurango
+      run: cmake --build build --config Release
+
+    - name: Static project checks
+      shell: pwsh
+      run: ./tests/validate_project.ps1
+
+    - name: Run contract tests
+      run: ctest --test-dir build -C Release --output-on-failure
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v7
+      with:
+        name: WinDurango-Release
+        path: build/bin/Release/
+        archive: true
