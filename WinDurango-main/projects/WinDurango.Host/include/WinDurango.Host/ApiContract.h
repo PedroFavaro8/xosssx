@@ -21,8 +21,8 @@ struct WinDurangoApiHost {
     void (*log)(const char* message);
 };
 
-using WinDurangoApiGetInfo = bool (*)(WinDurangoApiInfo* info);
-using WinDurangoApiInitialize = bool (*)(const WinDurangoApiHost* host);
+using WinDurangoApiGetInfoFn = bool (*)(WinDurangoApiInfo* info);
+using WinDurangoApiInitializeFn = bool (*)(const WinDurangoApiHost* host);
 
 }
 

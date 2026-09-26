@@ -62,9 +62,9 @@ bool LoadApiFile(const std::filesystem::path& file) {
         return false;
     }
 
-    const auto getInfo = reinterpret_cast<WinDurangoApiGetInfo>(
+    const auto getInfo = reinterpret_cast<WinDurangoApiGetInfoFn>(
         GetProcAddress(module, "WinDurangoApiGetInfo"));
-    const auto initialize = reinterpret_cast<WinDurangoApiInitialize>(
+    const auto initialize = reinterpret_cast<WinDurangoApiInitializeFn>(
         GetProcAddress(module, "WinDurangoApiInitialize"));
     WinDurangoApiInfo info{};
     WinDurangoApiHost host{WinDurangoApiAbiVersion, HostLog};
