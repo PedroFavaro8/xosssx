@@ -6,6 +6,12 @@
 #include <filesystem>
 #include <memory>
 
+// Windows.h defines CreateFile as a macro (CreateFileA/W); make sure our
+// interface method keeps its plain name in every translation unit.
+#ifdef CreateFile
+#undef CreateFile
+#endif
+
 namespace wd::common::interfaces::storage
 {
     // TODO should we have separate project for interfaces?

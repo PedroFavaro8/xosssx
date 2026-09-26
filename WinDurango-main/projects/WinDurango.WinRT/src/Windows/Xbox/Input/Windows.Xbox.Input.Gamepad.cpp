@@ -80,9 +80,8 @@ namespace winrt::Windows::Xbox::Input::implementation
 
         inline winrt::Windows::Foundation::DateTime ToDateTime(uint64_t millisSinceBoot)
         {
-            winrt::Windows::Foundation::DateTime value{};
-            value.UniversalTime = static_cast<int64_t>(millisSinceBoot * 10000ULL);
-            return value;
+            return winrt::Windows::Foundation::DateTime{
+                winrt::Windows::Foundation::TimeSpan{ static_cast<int64_t>(millisSinceBoot * 10000ULL) } };
         }
 
         struct NavigationReading : winrt::implements<NavigationReading, winrt::Windows::Xbox::Input::INavigationReading>
@@ -178,9 +177,8 @@ namespace winrt::Windows::Xbox::Input::implementation
 
     winrt::Windows::Foundation::DateTime GamepadReading::Timestamp()
     {
-        winrt::Windows::Foundation::DateTime value{};
-        value.UniversalTime = static_cast<int64_t>(reading.Timestamp * 10000ULL);
-        return value;
+        return winrt::Windows::Foundation::DateTime{
+            winrt::Windows::Foundation::TimeSpan{ static_cast<int64_t>(reading.Timestamp * 10000ULL) } };
     }
 
     winrt::Windows::Xbox::Input::GamepadButtons GamepadReading::Buttons()

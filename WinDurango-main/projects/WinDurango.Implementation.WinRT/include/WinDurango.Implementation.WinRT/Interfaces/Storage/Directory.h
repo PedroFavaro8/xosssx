@@ -7,6 +7,12 @@
 #include <winrt/Windows.Storage.h>
 #include <winrt/base.h>
 
+// Windows.h defines CreateFile as a macro (CreateFileA/W); make sure our
+// interface method keeps its plain name in every translation unit.
+#ifdef CreateFile
+#undef CreateFile
+#endif
+
 using namespace winrt::Windows::Storage;
 using namespace winrt;
 
