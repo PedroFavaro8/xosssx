@@ -231,6 +231,10 @@ int LaunchPackage(const std::filesystem::path& package) {
             {
                 continue;
             }
+            if (Lower(item.path().extension().wstring()) != L".exe")
+            {
+                continue;
+            }
             services.push_back(item.path());
         }
         std::sort(services.begin(), services.end());

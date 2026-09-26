@@ -40,7 +40,8 @@ bool LoadApiFile(const std::filesystem::path& file) {
     return false;
 #else
     std::error_code error;
-    if (!std::filesystem::is_regular_file(file, error) || error) {
+    if (Lower(file.extension().string()) != ".dll" ||
+        !std::filesystem::is_regular_file(file, error) || error) {
         return false;
     }
 
@@ -98,6 +99,9 @@ ApiLoadResult LoadApis(const std::filesystem::path& directory) {
     std::vector<std::filesystem::path> candidates;
     for (const auto& entry : std::filesystem::directory_iterator(directory, error)) {
         if (error || !entry.is_regular_file(error) || error) {
+            continue;
+        }
+        if (Lower(entry.path().extension().string()) != ".dll") {
             continue;
         }
         candidates.push_back(entry.path());
