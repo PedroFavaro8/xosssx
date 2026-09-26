@@ -45,7 +45,7 @@ jobs:
       run: |
           New-Item -ItemType Directory -Force -Path build
           cd build
-          cmake .. -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake
+          cmake ../WinDurango-main -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake
           cd ../
 
     - name: Build WinDurango
@@ -53,7 +53,7 @@ jobs:
 
     - name: Static project checks
       shell: pwsh
-      run: ./tests/validate_project.ps1
+      run: ./WinDurango-main/tests/validate_project.ps1
 
     - name: Run contract tests
       run: ctest --test-dir build -C Release --output-on-failure
