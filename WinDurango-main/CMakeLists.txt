@@ -73,6 +73,13 @@ if (BUILD_TESTING)
             WORKING_DIRECTORY "$<TARGET_FILE_DIR:WinDurangoHost>"
             PASS_REGULAR_EXPRESSION "package service started"
             TIMEOUT 120)
+        add_test(NAME WinDurangoMinimalHomebrewTest
+            COMMAND WinDurangoHost --launch-package
+                    "$<TARGET_FILE_DIR:WinDurangoHost>/apps/Minimal.wdapp")
+        set_tests_properties(WinDurangoMinimalHomebrewTest PROPERTIES
+            WORKING_DIRECTORY "$<TARGET_FILE_DIR:WinDurangoHost>"
+            PASS_REGULAR_EXPRESSION "rodando coisas alem do normal"
+            TIMEOUT 120)
     endif()
 
     if (WIN32)
