@@ -88,3 +88,10 @@ jobs:
         name: WinDurango-Release
         path: build/bin/Release/
         archive: true
+
+    - name: Upload R2Shims
+      uses: actions/upload-artifact@v7
+      with:
+        name: WinDurango-R2Shims
+        path: build/r2shim/
+        archive: true
