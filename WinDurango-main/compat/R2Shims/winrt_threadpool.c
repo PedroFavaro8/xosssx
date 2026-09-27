@@ -12,7 +12,7 @@ static DWORD WINAPI WD_TpThunk(LPVOID param) {
     PTP_SIMPLE_CALLBACK callback = ctxt->callback;
     PVOID context = ctxt->context;
     free(ctxt);
-    callback(NULL, context, NULL);
+    callback(NULL, context);
     return 0;
 }
 
