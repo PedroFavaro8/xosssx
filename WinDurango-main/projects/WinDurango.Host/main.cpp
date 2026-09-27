@@ -1,6 +1,8 @@
 #include <algorithm>
 #include <cctype>
+#include <cstdint>
 #include <filesystem>
+#include <fstream>
 #include <iostream>
 #include <string>
 #include <utility>
@@ -136,6 +138,115 @@ int probe_module(const std::filesystem::path& path) {
 #endif
 }
 
+struct PeFacts {
+    bool valid = false;
+    std::string machine = "n-a";
+    long sections = -1;
+    std::string subsystem = "n-a";
+    bool isDll = false;
+    bool hasImports = false;
+    bool hasSignature = false;
+};
+
+// Inspetor somente-leitura de cabecalhos PE/PE+ (spec publica). Nunca
+// executa o arquivo: so reporta fatos para diagnostico. Tudo com
+// bounds-check; qualquer anomalia => pe_valid=false, sem crash.
+PeFacts ReadPeFacts(const std::filesystem::path& path) {
+    PeFacts facts;
+    auto readU16 = [](const std::vector<uint8_t>& data, size_t off, uint16_t& out) {
+        if (off + 2 > data.size()) {
+            return false;
+        }
+        out = static_cast<uint16_t>(data[off] | (data[off + 1] << 8));
+        return true;
+    };
+    auto readU32 = [](const std::vector<uint8_t>& data, size_t off, uint32_t& out) {
+        if (off + 4 > data.size()) {
+            return false;
+        }
+        out = static_cast<uint32_t>(data[off]) | (static_cast<uint32_t>(data[off + 1]) << 8) |
+              (static_cast<uint32_t>(data[off + 2]) << 16) | (static_cast<uint32_t>(data[off + 3]) << 24);
+        return true;
+    };
+
+    std::error_code error;
+    const auto size = std::filesystem::file_size(path, error);
+    if (error || size < 64 || size > 64 * 1024 * 1024) {
+        return facts;
+    }
+    std::ifstream file(path, std::ios::binary);
+    if (!file) {
+        return facts;
+    }
+    std::vector<uint8_t> data(static_cast<size_t>(size));
+    file.read(reinterpret_cast<char*>(data.data()), static_cast<std::streamsize>(data.size()));
+    if (!file) {
+        return facts;
+    }
+
+    if (data[0] != 'M' || data[1] != 'Z') {
+        return facts;
+    }
+    uint32_t peOffset = 0;
+    if (!readU32(data, 0x3C, peOffset) || peOffset + 6 > data.size()) {
+        return facts;
+    }
+    if (data[peOffset] != 'P' || data[peOffset + 1] != 'E' || data[peOffset + 2] != 0 ||
+        data[peOffset + 3] != 0) {
+        return facts;
+    }
+    uint16_t machine = 0, numSections = 0, optSize = 0, characteristics = 0;
+    if (!readU16(data, peOffset + 4, machine) || !readU16(data, peOffset + 6, numSections) ||
+        !readU16(data, peOffset + 20, optSize) || !readU16(data, peOffset + 22, characteristics)) {
+        return facts;
+    }
+    if (machine == 0x8664) {
+        facts.machine = "x64";
+    } else if (machine == 0x14c) {
+        facts.machine = "x86";
+    } else if (machine == 0xaa64) {
+        facts.machine = "arm64";
+    } else {
+        facts.machine = "unknown";
+    }
+    facts.sections = numSections;
+    facts.isDll = (characteristics & 0x2000) != 0;
+
+    const size_t optOff = peOffset + 24;
+    uint16_t optMagic = 0;
+    if (!readU16(data, optOff, optMagic)) {
+        return facts;
+    }
+    size_t dirOff = 0;
+    if (optMagic == 0x10b) {
+        dirOff = optOff + 96;
+    } else if (optMagic == 0x20b) {
+        dirOff = optOff + 112;
+    } else {
+        return facts;
+    }
+    uint16_t subsystem = 0;
+    if (!readU16(data, optOff + 68, subsystem)) {
+        return facts;
+    }
+    if (subsystem == 2) {
+        facts.subsystem = "windows";
+    } else if (subsystem == 3) {
+        facts.subsystem = "console";
+    } else {
+        facts.subsystem = "unknown";
+    }
+    uint32_t rva = 0, rsize = 0;
+    if (readU32(data, dirOff + 8, rva) && readU32(data, dirOff + 12, rsize)) {
+        facts.hasImports = rva != 0 && rsize != 0;
+    }
+    if (readU32(data, dirOff + 32, rva) && readU32(data, dirOff + 36, rsize)) {
+        facts.hasSignature = rva != 0 && rsize != 0;
+    }
+    facts.valid = true;
+    return facts;
+}
+
 int inspect_media(const std::filesystem::path& path) {
     std::error_code error;
     if (!std::filesystem::exists(path, error) || error) {
@@ -162,9 +273,18 @@ int inspect_media(const std::filesystem::path& path) {
         media = "xbox-executable";
     }
 
+    const PeFacts pe = ReadPeFacts(path);
+
     std::cout << "media_type=" << media << "\n"
               << "execution_policy=unrestricted\n"
-              << "action=accepted\n";
+              << "action=accepted\n"
+              << "pe_valid=" << (pe.valid ? "true" : "false") << "\n"
+              << "pe_machine=" << pe.machine << "\n"
+              << "pe_sections=" << pe.sections << "\n"
+              << "pe_subsystem=" << pe.subsystem << "\n"
+              << "pe_is_dll=" << (pe.isDll ? "true" : "false") << "\n"
+              << "pe_has_imports=" << (pe.hasImports ? "true" : "false") << "\n"
+              << "pe_has_signature=" << (pe.hasSignature ? "true" : "false") << "\n";
     return 0;
 }
 
