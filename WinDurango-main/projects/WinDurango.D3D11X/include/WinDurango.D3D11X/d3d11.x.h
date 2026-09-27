@@ -14,6 +14,7 @@
 #include <cstdint>
 #include <DirectXTex.h>
 #include "WinDurango.Common/WinDurango.h"
+#include "WinDurango.Common/CompatOSVersion.h"
 
 extern std::shared_ptr<wd::common::WinDurango> p_wd;
 
@@ -32,47 +33,13 @@ std::mutex g_ResourceMapMutex;
 
 void GetCombaseVersion()
 {
-    DWORD FileVersionSize = GetFileVersionInfoSizeW(L".\\EmbeddedXvd\\Windows\\System32\\combase.dll", NULL);
-    if (!FileVersionSize)
-    {
-        MessageBoxW(nullptr,
-                    L"Couldn't get the combase version info size! Make sure you have EmbeddedXvd in the game root/Mount folder.",
-                    L"D3D11.X Error!", MB_ICONERROR);
-    }
-
-    BYTE *Data = new BYTE[FileVersionSize];
-    BOOL ret = GetFileVersionInfoW(L".\\EmbeddedXvd\\Windows\\System32\\combase.dll", NULL, FileVersionSize, Data);
-    if (!ret)
-    {
-        MessageBoxW(
-            nullptr,
-            L"Couldn't get the combase version info! Make sure you have EmbeddedXvd in the game root/Mount folder.",
-            L"D3D11.X Error!", MB_ICONERROR);
-        delete[] Data;
-    }
-
-    VS_FIXEDFILEINFO *pFixedFileInfo{};
-    UINT Length = 0;
-
-    VerQueryValueW(Data, L"\\", (LPVOID *)&pFixedFileInfo, &Length);
-    if (!pFixedFileInfo)
-    {
-        MessageBoxW(
-            nullptr,
-            L"Couldn't get the combase version value! Make sure you have EmbeddedXvd in the game root/Mount folder.",
-            L"D3D11.X Error!", MB_ICONERROR);
-        delete[] Data;
-    }
-
-    DWORD major = HIWORD(pFixedFileInfo->dwProductVersionMS);
-    DWORD minor = LOWORD(pFixedFileInfo->dwProductVersionMS);
-    DWORD build = HIWORD(pFixedFileInfo->dwProductVersionLS);
-    DWORD revision = LOWORD(pFixedFileInfo->dwProductVersionLS);
-
-    g_ABI.Major = major;
-    g_ABI.Minor = minor;
-    g_ABI.Build = build;
-    g_ABI.Revision = revision;
+    // Versao vinda do Windows host (ou fallback documentado); nao exige
+    // imagem de sistema do console e nao abre dialogo em DllMain.
+    const wd::common::CompatOSVersion version = wd::common::ResolveCompatOSVersion();
+    g_ABI.Major = version.major;
+    g_ABI.Minor = version.minor;
+    g_ABI.Build = version.build;
+    g_ABI.Revision = version.revision;
 }
 
 inline void CalculatePitch(uint32_t Width, uint32_t Height, DXGI_FORMAT Format, uint32_t* pRowPitch, uint32_t* pSlicePitch)

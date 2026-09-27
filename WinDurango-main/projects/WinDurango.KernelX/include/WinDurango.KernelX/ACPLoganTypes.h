@@ -1,5 +1,6 @@
 #pragma once
 #include "kernelx.h"
+#include "WinDurango.Common/CompatOSVersion.h"
 #include <Windows.h>
 #include <thread>
 
@@ -17,47 +18,13 @@ abi_t g_ABI;
 
 void GetCombaseVersion()
 {
-    DWORD FileVersionSize = GetFileVersionInfoSizeW(L".\\EmbeddedXvd\\Windows\\System32\\combase.dll", NULL);
-    if (!FileVersionSize)
-    {
-        MessageBoxW(nullptr,
-                    L"Couldn't get the combase version info size! Make sure you have EmbeddedXvd in the game root/Mount folder.",
-                    L"Logan Error!", MB_ICONERROR);
-    }
-
-    BYTE *Data = new BYTE[FileVersionSize];
-    BOOL ret = GetFileVersionInfoW(L".\\EmbeddedXvd\\Windows\\System32\\combase.dll", NULL, FileVersionSize, Data);
-    if (!ret)
-    {
-        MessageBoxW(
-            nullptr,
-            L"Couldn't get the combase version info! Make sure you have EmbeddedXvd in the game root/Mount folder.",
-            L"Logan Error!", MB_ICONERROR);
-        delete[] Data;
-    }
-
-    VS_FIXEDFILEINFO *pFixedFileInfo{};
-    UINT Length = 0;
-
-    VerQueryValueW(Data, L"\\", (LPVOID *)&pFixedFileInfo, &Length);
-    if (!pFixedFileInfo)
-    {
-        MessageBoxW(
-            nullptr,
-            L"Couldn't get the combase version value! Make sure you have EmbeddedXvd in the game root/Mount folder.",
-            L"Logan Error!", MB_ICONERROR);
-        delete[] Data;
-    }
-
-    DWORD major = HIWORD(pFixedFileInfo->dwProductVersionMS);
-    DWORD minor = LOWORD(pFixedFileInfo->dwProductVersionMS);
-    DWORD build = HIWORD(pFixedFileInfo->dwProductVersionLS);
-    DWORD revision = LOWORD(pFixedFileInfo->dwProductVersionLS);
-
-    g_ABI.Major = major;
-    g_ABI.Minor = minor;
-    g_ABI.Build = build;
-    g_ABI.Revision = revision;
+    // Versao vinda do Windows host (ou fallback documentado); nao exige
+    // imagem de sistema do console e nao abre dialogo.
+    const wd::common::CompatOSVersion version = wd::common::ResolveCompatOSVersion();
+    g_ABI.Major = version.major;
+    g_ABI.Minor = version.minor;
+    g_ABI.Build = version.build;
+    g_ABI.Revision = version.revision;
 }
 
 // All of the types were provided by DaZombieKiller, a huge thanks to him!

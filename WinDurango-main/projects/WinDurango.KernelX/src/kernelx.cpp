@@ -1,4 +1,5 @@
 #include "kernelx.h"
+#include "WinDurango.Common/CompatOSVersion.h"
 #include "Logan.h"
 #include <atlbase.h>
 #include "Hooks.h"
@@ -12,49 +13,17 @@ EXTERN_C CONSOLE_TYPE __stdcall GetConsoleType()
 
 EXTERN_C VOID __stdcall GetSystemOSVersion(LPSYSTEMOSVERSIONINFO lpVersionInformation)
 {
-    DWORD FileVersionSize = GetFileVersionInfoSizeW(L".\\EmbeddedXvd\\Windows\\System32\\combase.dll", NULL);
-    if (!FileVersionSize)
+    if (!lpVersionInformation)
     {
-        MessageBoxW(nullptr,
-                    L"Couldn't get the combase version info size! Make sure you have EmbeddedXvd in the game "
-                    L"root/Mount folder.",
-                    L"Error!", MB_OK);
+        return;
     }
-
-    BYTE *Data = new BYTE[FileVersionSize];
-    BOOL ret = GetFileVersionInfoW(L".\\EmbeddedXvd\\Windows\\System32\\combase.dll", NULL, FileVersionSize, Data);
-    if (!ret)
-    {
-        MessageBoxW(
-            nullptr,
-            L"Couldn't get the combase version info! Make sure you have EmbeddedXvd in the game root/Mount folder.",
-            L"Error!", MB_OK);
-        delete[] Data;
-    }
-
-    VS_FIXEDFILEINFO *pFixedFileInfo{};
-    UINT Length = 0;
-
-    VerQueryValueW(Data, L"\\", (LPVOID *)&pFixedFileInfo, &Length);
-    if (!pFixedFileInfo)
-    {
-        MessageBoxW(
-            nullptr,
-            L"Couldn't get the combase version value! Make sure you have EmbeddedXvd in the game root/Mount folder.",
-            L"Error!", MB_OK);
-        delete[] Data;
-    }
-
-    DWORD major = HIWORD(pFixedFileInfo->dwProductVersionMS);
-    DWORD minor = LOWORD(pFixedFileInfo->dwProductVersionMS);
-    DWORD build = HIWORD(pFixedFileInfo->dwProductVersionLS);
-    DWORD revision = LOWORD(pFixedFileInfo->dwProductVersionLS);
-
-    lpVersionInformation->MajorVersion = (BYTE)major;
-    lpVersionInformation->MinorVersion = (BYTE)minor;
-    lpVersionInformation->BuildNumber = (WORD)build;
-    lpVersionInformation->Revision = (WORD)revision;
-    delete[] Data;
+    // Versao vinda do Windows host (ou fallback documentado); nao exige
+    // imagem de sistema do console e nao abre dialogo.
+    const wd::common::CompatOSVersion version = wd::common::ResolveCompatOSVersion();
+    lpVersionInformation->MajorVersion = (BYTE)version.major;
+    lpVersionInformation->MinorVersion = (BYTE)version.minor;
+    lpVersionInformation->BuildNumber = (WORD)version.build;
+    lpVersionInformation->Revision = (WORD)version.revision;
 }
 
 EXTERN_C VOID __stdcall QueryProcessorSchedulingStatistics(PPROCESSOR_SCHEDULING_STATISTICS lpStatistics)
