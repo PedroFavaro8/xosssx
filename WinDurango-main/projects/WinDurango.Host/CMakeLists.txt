@@ -19,6 +19,14 @@ if (WIN32)
     target_compile_definitions(WinDurangoHost PRIVATE UNICODE _UNICODE NOMINMAX WIN32_LEAN_AND_MEAN)
 endif()
 
+if (MSVC)
+    # CRT estatico: o host roda offline sem VS Redist (ex. Windows
+    # Server antigo). Nao ha troca de objetos CRT com as DLLs (a ABI do
+    # host usa apenas tipos C e ponteiros de funcao).
+    set_target_properties(WinDurangoHost PROPERTIES
+        MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+endif()
+
 set_target_properties(WinDurangoHost PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
 )

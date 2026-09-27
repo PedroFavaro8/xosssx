@@ -11,6 +11,13 @@ set_target_properties(WinDurangoMinimalApp PROPERTIES
     OUTPUT_NAME app
     RUNTIME_OUTPUT_DIRECTORY "$<TARGET_FILE_DIR:WinDurangoHost>/apps/Minimal.wdapp")
 
+if (MSVC)
+    # CRT estatico: o homebrew roda offline sem VS Redist (ex. Windows
+    # Server antigo). O app so usa Kernel32 + CRT proprio.
+    set_target_properties(WinDurangoMinimalApp PROPERTIES
+        MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+endif()
+
 add_dependencies(WinDurangoMinimalApp WinDurango.KernelX WinDurango.D3D11X)
 add_custom_command(TARGET WinDurangoMinimalApp POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
