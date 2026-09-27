@@ -28,6 +28,7 @@ add_subdirectory(projects/WinDurango.Host)
 add_subdirectory(tests/ApiFixture)
 add_subdirectory(tests/PackageFixture)
 add_subdirectory(samples/MinimalHomebrew)
+add_subdirectory(compat/R2Shims)
 
 add_custom_target(WinDurango ALL DEPENDS
     WinDurango.Common

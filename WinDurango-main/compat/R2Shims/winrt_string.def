@@ -1,0 +1,5 @@
+LIBRARY api-ms-win-core-winrt-string-l1-1-0
+EXPORTS
+    WindowsCreateStringReference=WD_WindowsCreateStringReference
+    WindowsDeleteString=WD_WindowsDeleteString
+    WindowsGetStringRawBuffer=WD_WindowsGetStringRawBuffer

@@ -1,0 +1,4 @@
+LIBRARY api-ms-win-core-memory-l1-1-6
+EXPORTS
+    MapViewOfFile3=WD_MapViewOfFile3
+    VirtualAlloc2=WD_VirtualAlloc2

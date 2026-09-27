@@ -1,0 +1,5 @@
+LIBRARY api-ms-win-core-winrt-error-l1-1-0
+EXPORTS
+    RoOriginateError=WD_RoOriginateError
+    RoTransformError=WD_RoTransformError
+    RoFailFastWithErrorContext=WD_RoFailFastWithErrorContext
